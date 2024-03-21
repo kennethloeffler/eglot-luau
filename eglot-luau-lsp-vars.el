@@ -17,10 +17,6 @@
 ;; Declare eglot variables to silence warnings
 (defvar eglot-server-programs)
 
-;; Whether the client has checked for updated Roblox types/docs
-;; Used to prevent unnecessary HTTP requests
-(defvar eglot-luau-lsp-has-checked-version nil)
-
 ;; User customization
 (defgroup eglot-luau-lsp nil
   "Customization for luau-lsp."

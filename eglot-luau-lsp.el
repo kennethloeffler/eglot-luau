@@ -41,23 +41,19 @@
 (defun eglot-luau-lsp-is-outdated ()
   "Fetch and compare locally stored Roblox docs and types with the latest."
   (eglot-luau-lsp--ensure-storage)
-  (if eglot-luau-lsp-has-checked-version
-      (eglot-luau-lsp--which-files-missing)
-    (progn
-      (setq eglot-luau-lsp-has-checked-version t)
-      (with-temp-buffer
-        (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
-        (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
-          (if (file-exists-p version-file)
-              (let ((stored-version (with-temp-buffer
-                                      (insert-file-contents version-file)
-                                      (buffer-string))))
-                (if (not (string= stored-version (buffer-string)))
-                    '(t t)
-                  (eglot-luau-lsp--which-files-missing)))
-            (progn
-              (write-file version-file)
-              '(t t))))))))
+  (with-temp-buffer
+    (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
+    (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
+      (if (file-exists-p version-file)
+          (let ((stored-version (with-temp-buffer
+                                  (insert-file-contents version-file)
+                                  (buffer-string))))
+            (if (not (string= stored-version (buffer-string)))
+                '(t t)
+              (eglot-luau-lsp--which-files-missing)))
+        (progn
+          (write-file version-file)
+          '(t t))))))
 
 (defun eglot-luau-lsp-update-roblox-docs ()
   "Fetch and store Roblox API docs."
