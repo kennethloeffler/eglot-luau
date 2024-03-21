@@ -64,9 +64,11 @@
              (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri))))))
 
 (defun eglot-luau-lsp-is-outdated ()
-  "Fetch and compare locally stored Roblox docs and types with the latest.
+  "Compare versions of locally stored Roblox docs/types with the latest versions.
 Return a list of bools that indicate whether the types and/or
-docs files, respectively, need to be updated."
+docs files, respectively, need to be updated.  Respects the
+`eglot-luau-lsp-auto-update-roblox-types' and
+`eglot-luau-lsp-auto-update-roblox-docs' settings."
   (if (not (or eglot-lua-lsp-auto-update-roblox-types
                eglot-luau-lsp-auto-update-roblox-docs))
       ;; Don't do anything if user doesn't want Roblox types or docs
