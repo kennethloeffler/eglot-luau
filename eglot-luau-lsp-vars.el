@@ -14,16 +14,12 @@
 ;; URL providing latest Roblox version
 (defconst eglot-luau-lsp-roblox-version-url "https://raw.githubusercontent.com/CloneTrooper1019/Roblox-Client-Tracker/roblox/version.txt")
 
-;; Forward declare eglot variable to silence warnings
+;; Declare eglot variables to silence warnings
 (defvar eglot-server-programs)
 
-;; Whether we should update Roblox types.
-;; Set to nil after updating docs for a session.
-(defvar eglot-luau-lsp-should-update-roblox-types t)
-
-;; Whether we should update Roblox docs.
-;; Set to nil after updating docs for a session.
-(defvar eglot-luau-lsp-should-update-roblox-docs t)
+;; Whether the client has checked for updated Roblox types/docs
+;; Used to prevent unnecessary HTTP requests
+(defvar eglot-luau-lsp-has-not-checked-version t)
 
 ;; User customization
 (defgroup eglot-luau-lsp nil
