@@ -56,27 +56,36 @@
   "Return where to store version files."
   (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-version")))
 
-(defun eglot-luau-lsp--which-files-missing ()
-  "Return a list of bools that say whether type or doc files (respectively) are missing."
-  (list (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri)))
-        (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri)))))
+(defun eglot-luau-lsp--which-files-need-update ()
+  "Return a list of bools that indicate whether type or doc files (respectively) should be updated."
+  (list (and eglot-luau-lsp-auto-update-roblox-types
+             (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri))))
+        (and eglot-luau-lsp-auto-update-roblox-docs
+             (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri))))))
 
 (defun eglot-luau-lsp-is-outdated ()
   "Fetch and compare locally stored Roblox docs and types with the latest."
-  (eglot-luau-lsp--ensure-storage)
-  (with-temp-buffer
-    (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
-    (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
-      (if (file-exists-p version-file)
-          (let ((stored-version (with-temp-buffer
-                                  (insert-file-contents version-file)
-                                  (buffer-string))))
-            (if (not (string= stored-version (buffer-string)))
-                '(t t)
-              (eglot-luau-lsp--which-files-missing)))
-        (progn
-          (write-file version-file)
-          '(t t))))))
+  (if (not (or eglot-luau-lsp-auto-update-roblox-types
+               eglot-luau-lsp-auto-update-roblox-docs))
+      ;; Don't make any HTTP requests if user doesn't want Roblox
+      ;; types or docs
+      '(nil nil)
+    (progn
+      (eglot-luau-lsp--ensure-storage)
+      (with-temp-buffer
+        (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
+        (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
+          (if (file-exists-p version-file)
+              (let ((stored-version (with-temp-buffer
+                                      (insert-file-contents version-file)
+                                      (buffer-string))))
+                (if (not (string= stored-version (buffer-string)))
+                    (list eglot-luau-lsp-auto-update-roblox-types
+                          eglot-luau-lsp-auto-update-roblox-docs)
+                  (eglot-luau-lsp--which-files-need-update)))
+            (progn
+              (write-file version-file)
+              (eglot-luau-lsp--which-files-need-update))))))))
 
 (defun eglot-luau-lsp-update-roblox-docs ()
   "Download and store latest Roblox API docs."
@@ -104,9 +113,9 @@
   (pcase-let ((`(,types-need-update ,docs-need-update)
                (ignore-errors (eglot-luau-lsp-is-outdated))))
     (progn
-      (if (and types-need-update eglot-luau-lsp-auto-update-roblox-types)
+      (if types-need-update
           (ignore-errors (eglot-luau-lsp-update-roblox-types)))
-      (if (and docs-need-update eglot-luau-lsp-auto-update-roblox-docs)
+      (if docs-need-update
           (ignore-errors (eglot-luau-lsp-update-roblox-docs)))))
   (eglot-luau-lsp-add-server-program))
 
