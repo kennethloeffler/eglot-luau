@@ -68,7 +68,7 @@
     (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
 
 (defun eglot-luau-lsp-add-server-program ()
-  "Add luau-lsp as an eglot server program lua-mode buffers."
+  "Add luau-lsp as an eglot server program for lua-mode buffers."
   (add-to-list
    'eglot-server-programs
    `(lua-mode . ("luau-lsp" "lsp"
