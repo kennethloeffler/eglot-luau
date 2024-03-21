@@ -100,13 +100,22 @@ docs files need to be updated."
     (url-insert-file-contents (eglot-luau-lsp-roblox-types-url))
     (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
 
+(defun eglot-luau-lsp--build-command-list ()
+  "Build the list of strings used for spawning the luau-lsp process."
+  (let ((command-list (list "lsp" "luau-lsp"))
+        (types-file (eglot-luau-lsp-roblox-types-storage-uri))
+        (docs-file (eglot-luau-lsp-roblox-docs-storage-uri)))
+    (progn
+      (if (file-exists-p types-file)
+          (push (format "--definitions=%s" types-file) command-list))
+      (if (file-exists-p docs-file)
+          (push (format "--docs=%s" docs-file) command-list))
+      (nreverse command-list))))
+
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for lua-mode buffers."
-  (add-to-list
-   'eglot-server-programs
-   `(lua-mode . ("luau-lsp" "lsp"
-                 ,(format "--definitions=%s" (eglot-luau-lsp-roblox-types-storage-uri))
-                 ,(format "--docs=%s" (eglot-luau-lsp-roblox-docs-storage-uri))))))
+  (add-to-list 'eglot-server-programs
+               `(lua-mode . ,(eglot-luau-lsp--build-command-list))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-setup ()
