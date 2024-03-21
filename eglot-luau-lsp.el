@@ -102,8 +102,8 @@ docs files, respectively, need to be updated.  Respects the
     (url-insert-file-contents (eglot-luau-lsp-roblox-types-url))
     (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
 
-(defun eglot-luau-lsp--build-command-list ()
-  "Build the list of strings used for spawning the luau-lsp process."
+(defun eglot-luau-lsp--build-server-command-list ()
+  "Return a list of strings that can be used to spawn the luau-lsp server process."
   (let ((command-list (list "lsp" "luau-lsp"))
         (types-file (eglot-luau-lsp-roblox-types-storage-uri))
         (docs-file (eglot-luau-lsp-roblox-docs-storage-uri)))
@@ -117,7 +117,7 @@ docs files, respectively, need to be updated.  Respects the
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for lua-mode buffers."
   (add-to-list 'eglot-server-programs
-               `(lua-mode . ,(eglot-luau-lsp--build-command-list))))
+               `(lua-mode . ,(eglot-luau-lsp--build-server-command-list))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-setup ()
