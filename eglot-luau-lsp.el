@@ -66,8 +66,8 @@
 (defun eglot-luau-lsp-is-outdated ()
   "Fetch and compare locally stored Roblox docs and types with the latest.
 Return a list of bools that indicate whether the types and/or
-docs files need to be updated."
-  (if (not (or eglot-luau-lsp-auto-update-roblox-types
+docs files, respectively, need to be updated."
+  (if (not (or eglot-lua-lsp-auto-update-roblox-types
                eglot-luau-lsp-auto-update-roblox-docs))
       ;; Don't do anything if user doesn't want Roblox types or docs
       '(nil nil)
