@@ -57,7 +57,7 @@
   (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-version")))
 
 (defun eglot-luau-lsp--which-files-missing ()
-  "Do the thing."
+  "Return a list of bools that say whether type or doc files (respectively) are missing."
   (list (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri)))
         (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri)))))
 
