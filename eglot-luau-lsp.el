@@ -36,19 +36,23 @@
 (defun eglot-luau-lsp-is-outdated ()
   "Fetch and compare locally stored Roblox version with the latest."
   (eglot-luau-lsp--ensure-storage)
-  (with-temp-buffer
-    (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
-    (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
-      (if (file-exists-p version-file)
-          (let ((stored-version (with-temp-buffer
-                                  (insert-file-contents version-file)
-                                  (buffer-string))))
-            (or (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri)))
-                (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri)))
-                (not (string= stored-version (buffer-string)))))
-        (progn
-          (write-file version-file)
-          t)))))
+  (if eglot-luau-lsp-has-checked-version
+      nil
+    (progn
+      (setq eglot-luau-lsp-has-checked-version t)
+      (with-temp-buffer
+        (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
+        (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
+          (if (file-exists-p version-file)
+              (let ((stored-version (with-temp-buffer
+                                      (insert-file-contents version-file)
+                                      (buffer-string))))
+                (or (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri)))
+                    (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri)))
+                    (not (string= stored-version (buffer-string)))))
+            (progn
+              (write-file version-file)
+              t)))))))
 
 (defun eglot-luau-lsp-update-roblox-docs ()
   "Fetch and store Roblox API docs."
@@ -74,8 +78,8 @@
 (defun eglot-luau-lsp-setup ()
   "Add luau-lsp as a server program for eglot in lua-mode buffers."
   (if (ignore-errors (eglot-luau-lsp-is-outdated))
-      (progn (eglot-luau-lsp-update-roblox-types)
-             (eglot-luau-lsp-update-roblox-docs)))
+      (progn (ignore-errors (eglot-luau-lsp-update-roblox-types))
+             (ignore-errors (eglot-luau-lsp-update-roblox-docs))))
   (eglot-luau-lsp-add-server-program))
 
 (provide 'eglot-luau-lsp)
