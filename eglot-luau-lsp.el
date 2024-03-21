@@ -56,13 +56,13 @@
           '(t t))))))
 
 (defun eglot-luau-lsp-update-roblox-docs ()
-  "Fetch and store Roblox API docs."
+  "Download and store latest Roblox API docs."
   (with-temp-buffer
     (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
     (write-file (eglot-luau-lsp-roblox-docs-storage-uri))))
 
 (defun eglot-luau-lsp-update-roblox-types ()
-  "Fetch and store Roblox type definitions."
+  "Download and store latest Roblox type definitions."
   (with-temp-buffer
     (url-insert-file-contents (eglot-luau-lsp-roblox-types-url))
     (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
