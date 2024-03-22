@@ -35,24 +35,24 @@
   (if (not (file-directory-p eglot-luau-lsp-storage-location))
       (make-directory eglot-luau-lsp-storage-location)))
 
-(defun eglot-luau-lsp-roblox-types-url ()
+(defun eglot-luau-lsp--roblox-types-url ()
   "Return a URL that responds with Roblox type information."
   (format
    "http://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.%s.d.luau"
    eglot-luau-lsp-roblox-security-level))
 
-(defun eglot-luau-lsp-roblox-types-storage-uri ()
+(defun eglot-luau-lsp--roblox-types-storage-uri ()
   "Return where to store type definition files."
   (expand-file-name (concat eglot-luau-lsp-storage-location
                             (format "roblox-global-types-%s"
                                     eglot-luau-lsp-roblox-security-level))))
 
-(defun eglot-luau-lsp-roblox-docs-storage-uri ()
+(defun eglot-luau-lsp--roblox-docs-storage-uri ()
   "Return where to store doc files."
   (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-api-docs")))
 
 
-(defun eglot-luau-lsp-roblox-version-storage-uri ()
+(defun eglot-luau-lsp--roblox-version-storage-uri ()
   "Return where to store version files."
   (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-version")))
 
@@ -61,9 +61,9 @@
 Each bool in the list indicates whether the types or docs file
 need updates, respectively."
   (list (and eglot-luau-lsp-auto-update-roblox-types
-             (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri))))
+             (not (file-exists-p (eglot-luau-lsp--roblox-types-storage-uri))))
         (and eglot-luau-lsp-auto-update-roblox-docs
-             (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri))))))
+             (not (file-exists-p (eglot-luau-lsp--roblox-docs-storage-uri))))))
 
 (defun eglot-luau-lsp--is-outdated ()
   "Compare versions of locally stored Roblox docs/types with the latest versions.
@@ -79,7 +79,7 @@ docs files, respectively, need to be updated.  Respects the
       (eglot-luau-lsp--ensure-storage)
       (with-temp-buffer
         (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
-        (let ((version-file (eglot-luau-lsp-roblox-version-storage-uri)))
+        (let ((version-file (eglot-luau-lsp--roblox-version-storage-uri)))
           (if (file-exists-p version-file)
               (let ((stored-version (with-temp-buffer
                                       (insert-file-contents version-file)
@@ -95,8 +95,8 @@ docs files, respectively, need to be updated.  Respects the
 (defun eglot-luau-lsp--build-server-command-list ()
   "Return a list of strings that can be used to spawn the luau-lsp server process."
   (let ((command-list (list "lsp" "luau-lsp"))
-        (types-file (eglot-luau-lsp-roblox-types-storage-uri))
-        (docs-file (eglot-luau-lsp-roblox-docs-storage-uri)))
+        (types-file (eglot-luau-lsp--roblox-types-storage-uri))
+        (docs-file (eglot-luau-lsp--roblox-docs-storage-uri)))
     (if (file-exists-p types-file)
         (push (format "--definitions=%s" types-file) command-list))
     (if (file-exists-p docs-file)
@@ -169,14 +169,14 @@ is not installed, or when a file at
   "Download and store latest Roblox API docs."
   (with-temp-buffer
     (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
-    (write-file (eglot-luau-lsp-roblox-docs-storage-uri))))
+    (write-file (eglot-luau-lsp--roblox-docs-storage-uri))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-update-roblox-types ()
   "Download and store latest Roblox type definitions."
   (with-temp-buffer
-    (url-insert-file-contents (eglot-luau-lsp-roblox-types-url))
-    (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
+    (url-insert-file-contents (eglot-luau-lsp--roblox-types-url))
+    (write-file (eglot-luau-lsp--roblox-types-storage-uri))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-add-server-program ()
