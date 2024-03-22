@@ -134,7 +134,14 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
                                    "*luau-lsp Rojo sourcemap error*")
         (princ
          (format
-          "eglot-luau-lsp encountered an error while generating a sourcemap:\n\n%s"
+          "eglot-luau-lsp attempted to generate a sourcemap using the following command:
+
+%s
+
+...but the command outputted an error:
+
+%s"
+          (mapconcat 'identity (eglot-luau-lsp--build-rojo-command-list) " ")
           output)))))
 
 (defun eglot-luau-lsp--rojo-process-handler (server &rest _)
