@@ -149,7 +149,7 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
 SERVER must have a language-id equal to \"luau\". Fails when Rojo
 is not installed, or when a file at
 `eglot-luau-lsp-rojo-project-path' cannot be found."
-  (if-let ((sourcemap-enabled eglot-luau-lsp-rojo-sourcemap-enabled)
+  (if-let ((is-sourcemap-enabled eglot-luau-lsp-rojo-sourcemap-enabled)
            (_is-luau-server (string= (slot-value server 'language-id) "luau"))
            (is-rojo-installed (executable-find "rojo")))
       (let ((rojo-process (make-process
@@ -169,7 +169,7 @@ is not installed, or when a file at
                       (progn (kill-process rojo-process)
                              (advice-remove 'eglot-shutdown "kill-rojo"))))
          '((name . "kill-rojo"))))
-    (if (and sourcemap-enabled
+    (if (and is-sourcemap-enabled
              (not is-rojo-installed))
         (with-output-to-temp-buffer (get-buffer-create
                                    "*luau-lsp Rojo sourcemap error*")
