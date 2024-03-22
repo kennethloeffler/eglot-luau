@@ -172,8 +172,8 @@ is not installed, or when a file at
     (if (and is-sourcemap-enabled
              (not is-rojo-installed))
         (with-output-to-temp-buffer (get-buffer-create
-                                   "*luau-lsp Rojo sourcemap error*")
-        (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
+                                     "*luau-lsp Rojo sourcemap error*")
+          (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-add-server-program ()
