@@ -128,10 +128,11 @@ docs files, respectively, need to be updated.  Respects the
 
 (defun eglot-luau-lsp--rojo-process-filter (_process output)
   "Process filter that displays any errors during Rojo sourcemap generation.
-If OUTPUT contains \"ERROR\", display the output in a pop-up buffer."
-  (if (string-match "ERROR" output)
+If OUTPUT contains an error message, display the output in a pop-up buffer."
+  (if (string-match "error" output)
       (with-output-to-temp-buffer (get-buffer-create
                                    "*luau-lsp Rojo sourcemap error*")
+        (princ "eglot-luau-lsp encountered an error while generating a sourcemap:\n\n")
         (princ output))))
 
 (defun eglot-luau-lsp--rojo-process-handler (server &rest _)
