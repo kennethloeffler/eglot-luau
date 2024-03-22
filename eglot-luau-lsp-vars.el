@@ -65,5 +65,11 @@
   :options '("None" "LocalUserSecurity" "PluginSecurity" "RobloxScriptSecurity")
   :group 'eglot-luau-lsp)
 
+(defcustom eglot-luau-lsp-rojo-project-path
+  "default.project.json"
+  "A relative path to the Rojo project to use for sourcemap generation."
+  :type 'string
+  :group 'eglot-luau-lsp)
+
 (provide 'eglot-luau-lsp-vars)
 ;;; eglot-luau-lsp-vars.el ends here

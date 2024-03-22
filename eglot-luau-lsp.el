@@ -115,11 +115,38 @@ docs files, respectively, need to be updated.  Respects the
         (push (format "--docs=%s" docs-file) command-list))
     (nreverse command-list)))
 
+(defun eglot-luau-lsp--build-rojo-command-list ()
+  "Return a list of strings that can be used to start the Rojo process."
+  (let ((command-list (list "--watch"
+                            "sourcemap.json" "--output"
+                            "sourcemap" "rojo")))
+    (push (expand-file-name eglot-luau-lsp-rojo-project-path)
+          command-list)
+    (if eglot-luau-lsp-sourcemap-includes-non-scripts
+        (push "--include-non-scripts" command-list))
+    (nreverse command-list)))
+
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for lua-mode buffers."
   (add-to-list 'eglot-server-programs
                `((lua-mode :language-id "luau")
                  . ,(eglot-luau-lsp--build-server-command-list))))
+
+(defun eglot-luau-lsp--rojo-process-handler (server)
+  "Handle the Rojo process for SERVER."
+  (if (and (string= (slot-value server 'language-id) "luau")
+           (executable-find "rojo"))
+      (let ((rojo-process (make-process
+                           :name "luau-lsp-rojo"
+                           :command (eglot-luau-lsp--build-rojo-command-list)
+                           :noquery t)))
+        (advice-add
+         'eglot-shutdown
+         :after (lambda (server-shutting-down &rest _)
+                  (if (eq server server-shutting-down)
+                      (progn (kill-process rojo-process)
+                             (advice-remove 'eglot-shutdown "kill-rojo"))))
+         '((name . "kill-rojo"))))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-setup ()
@@ -130,6 +157,8 @@ docs files, respectively, need to be updated.  Respects the
         (ignore-errors (eglot-luau-lsp-update-roblox-types)))
     (if docs-need-update
         (ignore-errors (eglot-luau-lsp-update-roblox-docs))))
+  (add-hook 'eglot-server-initialized-hook
+            #'eglot-luau-lsp--rojo-process-handler)
   (eglot-luau-lsp-add-server-program))
 
 (provide 'eglot-luau-lsp)
