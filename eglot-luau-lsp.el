@@ -109,12 +109,11 @@ docs files, respectively, need to be updated.  Respects the
   (let ((command-list (list "lsp" "luau-lsp"))
         (types-file (eglot-luau-lsp-roblox-types-storage-uri))
         (docs-file (eglot-luau-lsp-roblox-docs-storage-uri)))
-    (progn
-      (if (file-exists-p types-file)
-          (push (format "--definitions=%s" types-file) command-list))
-      (if (file-exists-p docs-file)
-          (push (format "--docs=%s" docs-file) command-list))
-      (nreverse command-list))))
+    (if (file-exists-p types-file)
+        (push (format "--definitions=%s" types-file) command-list))
+    (if (file-exists-p docs-file)
+        (push (format "--docs=%s" docs-file) command-list))
+    (nreverse command-list)))
 
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for lua-mode buffers."
