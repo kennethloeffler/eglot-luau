@@ -189,11 +189,11 @@ is not installed, or when a file at
 (defun eglot-luau-lsp-setup ()
   "Add luau-lsp as a server program for eglot in `lua-mode' buffers."
   (pcase-let ((`(,types-need-update ,docs-need-update)
-               (ignore-errors (eglot-luau-lsp-is--outdated))))
+               (with-demoted-errors (eglot-luau-lsp--is-outdated))))
     (if types-need-update
-        (ignore-errors (eglot-luau-lsp-update-roblox-types)))
+        (with-demoted-errors (eglot-luau-lsp-update-roblox-types)))
     (if docs-need-update
-        (ignore-errors (eglot-luau-lsp-update-roblox-docs))))
+        (with-demoted-errors (eglot-luau-lsp-update-roblox-docs))))
   (add-hook 'eglot-server-initialized-hook
             #'eglot-luau-lsp--rojo-process-handler)
   (eglot-luau-lsp-add-server-program))
