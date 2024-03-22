@@ -92,18 +92,6 @@ docs files, respectively, need to be updated.  Respects the
               (write-file version-file)
               (eglot-luau-lsp--which-files-need-update))))))))
 
-(defun eglot-luau-lsp-update-roblox-docs ()
-  "Download and store latest Roblox API docs."
-  (with-temp-buffer
-    (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
-    (write-file (eglot-luau-lsp-roblox-docs-storage-uri))))
-
-(defun eglot-luau-lsp-update-roblox-types ()
-  "Download and store latest Roblox type definitions."
-  (with-temp-buffer
-    (url-insert-file-contents (eglot-luau-lsp-roblox-types-url))
-    (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
-
 (defun eglot-luau-lsp--build-server-command-list ()
   "Return a list of strings that can be used to spawn the luau-lsp server process."
   (let ((command-list (list "lsp" "luau-lsp"))
@@ -174,6 +162,21 @@ is not installed, or when a file at
         (with-output-to-temp-buffer (get-buffer-create
                                      "*luau-lsp Rojo sourcemap error*")
           (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
+
+
+;;;###autoload
+(defun eglot-luau-lsp-update-roblox-docs ()
+  "Download and store latest Roblox API docs."
+  (with-temp-buffer
+    (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
+    (write-file (eglot-luau-lsp-roblox-docs-storage-uri))))
+
+;;;###autoload
+(defun eglot-luau-lsp-update-roblox-types ()
+  "Download and store latest Roblox type definitions."
+  (with-temp-buffer
+    (url-insert-file-contents (eglot-luau-lsp-roblox-types-url))
+    (write-file (eglot-luau-lsp-roblox-types-storage-uri))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-add-server-program ()
