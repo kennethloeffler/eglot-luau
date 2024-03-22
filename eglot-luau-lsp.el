@@ -65,7 +65,7 @@ need updates, respectively."
         (and eglot-luau-lsp-auto-update-roblox-docs
              (not (file-exists-p (eglot-luau-lsp-roblox-docs-storage-uri))))))
 
-(defun eglot-luau-lsp-is-outdated ()
+(defun eglot-luau-lsp--is-outdated ()
   "Compare versions of locally stored Roblox docs/types with the latest versions.
 Return a list of bools that indicate whether the types and/or
 docs files, respectively, need to be updated.  Respects the
@@ -186,7 +186,7 @@ is not installed, or when a file at
 (defun eglot-luau-lsp-setup ()
   "Add luau-lsp as a server program for eglot in `lua-mode' buffers."
   (pcase-let ((`(,types-need-update ,docs-need-update)
-               (ignore-errors (eglot-luau-lsp-is-outdated))))
+               (ignore-errors (eglot-luau-lsp-is--outdated))))
     (if types-need-update
         (ignore-errors (eglot-luau-lsp-update-roblox-types)))
     (if docs-need-update
