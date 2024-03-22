@@ -132,7 +132,7 @@ docs files, respectively, need to be updated.  Respects the
                `((lua-mode :language-id "luau")
                  . ,(eglot-luau-lsp--build-server-command-list))))
 
-(defun eglot-luau-lsp--rojo-process-handler (server)
+(defun eglot-luau-lsp--rojo-process-handler (server &rest _)
   "Handle the Rojo process for SERVER."
   (if (and (string= (slot-value server 'language-id) "luau")
            (executable-find "rojo"))
