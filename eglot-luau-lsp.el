@@ -118,7 +118,8 @@ docs files, respectively, need to be updated.  Respects the
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for lua-mode buffers."
   (add-to-list 'eglot-server-programs
-               `(lua-mode . ,(eglot-luau-lsp--build-server-command-list))))
+               `((lua-mode :language-id "luau")
+                 . ,(eglot-luau-lsp--build-server-command-list))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-setup ()
