@@ -132,8 +132,10 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
   (if (string-match "error" output)
       (with-output-to-temp-buffer (get-buffer-create
                                    "*luau-lsp Rojo sourcemap error*")
-        (princ "eglot-luau-lsp encountered an error while generating a sourcemap:\n\n")
-        (princ output))))
+        (princ
+         (format
+          "eglot-luau-lsp encountered an error while generating a sourcemap:\n\n%s"
+          output)))))
 
 (defun eglot-luau-lsp--rojo-process-handler (server &rest _)
   "Handle the Rojo process for SERVER.
