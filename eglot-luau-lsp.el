@@ -133,7 +133,9 @@ docs files, respectively, need to be updated.  Respects the
                  . ,(eglot-luau-lsp--build-server-command-list))))
 
 (defun eglot-luau-lsp--rojo-process-handler (server &rest _)
-  "Handle the Rojo process for SERVER."
+  "Handle the Rojo process for SERVER.
+SERVER must have a language-id equal to \"luau\". Fails when Rojo
+is not installed, or when the project file cannot be found."
   (if (and (string= (slot-value server 'language-id) "luau")
            (executable-find "rojo"))
       (let ((rojo-process (make-process
