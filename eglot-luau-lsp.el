@@ -139,7 +139,7 @@ is not installed, or when the project file cannot be found."
   (if (and (string= (slot-value server 'language-id) "luau")
            (executable-find "rojo"))
       (let ((rojo-process (make-process
-                           :name "luau-lsp-rojo"
+                           :name "luau-lsp-rojo-sourcemap"
                            :command (eglot-luau-lsp--build-rojo-command-list)
                            :noquery t)))
         (advice-add
