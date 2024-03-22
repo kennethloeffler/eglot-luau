@@ -126,12 +126,6 @@ docs files, respectively, need to be updated.  Respects the
         (push "--include-non-scripts" command-list))
     (nreverse command-list)))
 
-(defun eglot-luau-lsp-add-server-program ()
-  "Add luau-lsp as an eglot server program for lua-mode buffers."
-  (add-to-list 'eglot-server-programs
-               `((lua-mode :language-id "luau")
-                 . ,(eglot-luau-lsp--build-server-command-list))))
-
 (defun eglot-luau-lsp--rojo-process-filter (_process output)
   "Process filter that displays any errors during Rojo sourcemap generation.
 If OUTPUT contains \"ERROR\", display the output in a pop-up buffer."
@@ -160,8 +154,15 @@ is not installed, or when the project file cannot be found."
          '((name . "kill-rojo"))))))
 
 ;;;###autoload
+(defun eglot-luau-lsp-add-server-program ()
+  "Add luau-lsp as an eglot server program for `lua-mode' buffers."
+  (add-to-list 'eglot-server-programs
+               `((lua-mode :language-id "luau")
+                 . ,(eglot-luau-lsp--build-server-command-list))))
+
+;;;###autoload
 (defun eglot-luau-lsp-setup ()
-  "Add luau-lsp as a server program for eglot in lua-mode buffers."
+  "Add luau-lsp as a server program for eglot in `lua-mode' buffers."
   (pcase-let ((`(,types-need-update ,docs-need-update)
                (ignore-errors (eglot-luau-lsp-is-outdated))))
     (if types-need-update
