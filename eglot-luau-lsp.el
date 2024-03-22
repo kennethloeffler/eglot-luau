@@ -145,6 +145,11 @@ is not installed, or when the project file cannot be found."
                            :command (eglot-luau-lsp--build-rojo-command-list)
                            :filter #'eglot-luau-lsp--rojo-process-filter
                            :noquery t)))
+        ;; eglot does not provice any hooks for server shutdown, so to
+        ;; know when to kill the Rojo process, we have to advise
+        ;; `eglot-shutdown' temporarily. This is a bit ugly and goes
+        ;; against elisp code conventions, but it's the only way to
+        ;; do it right now!
         (advice-add
          'eglot-shutdown
          :after (lambda (server-shutting-down &rest _)
