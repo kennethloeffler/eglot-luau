@@ -57,7 +57,9 @@
   (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-version")))
 
 (defun eglot-luau-lsp--which-files-need-update ()
-  "Return a list of bools that indicate whether type or doc files (respectively) should be updated."
+  "Return a list of bools that indicate which Roblox resources should be updated.
+Each bool in the list indicates whether the types or docs file
+need updates, respectively."
   (list (and eglot-luau-lsp-auto-update-roblox-types
              (not (file-exists-p (eglot-luau-lsp-roblox-types-storage-uri))))
         (and eglot-luau-lsp-auto-update-roblox-docs
