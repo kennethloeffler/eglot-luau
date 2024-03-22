@@ -71,7 +71,7 @@ Return a list of bools that indicate whether the types and/or
 docs files, respectively, need to be updated.  Respects the
 `eglot-luau-lsp-auto-update-roblox-types' and
 `eglot-luau-lsp-auto-update-roblox-docs' settings."
-  (if (not (or eglot-lua-lsp-auto-update-roblox-types
+  (if (not (or eglot-luau-lsp-auto-update-roblox-types
                eglot-luau-lsp-auto-update-roblox-docs))
       ;; Don't do anything if user doesn't want Roblox types or docs
       '(nil nil)
