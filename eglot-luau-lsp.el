@@ -126,11 +126,10 @@ docs files, respectively, need to be updated.  Respects the
   "Add luau-lsp as a server program for eglot in lua-mode buffers."
   (pcase-let ((`(,types-need-update ,docs-need-update)
                (ignore-errors (eglot-luau-lsp-is-outdated))))
-    (progn
-      (if types-need-update
-          (ignore-errors (eglot-luau-lsp-update-roblox-types)))
-      (if docs-need-update
-          (ignore-errors (eglot-luau-lsp-update-roblox-docs)))))
+    (if types-need-update
+        (ignore-errors (eglot-luau-lsp-update-roblox-types)))
+    (if docs-need-update
+        (ignore-errors (eglot-luau-lsp-update-roblox-docs))))
   (eglot-luau-lsp-add-server-program))
 
 (provide 'eglot-luau-lsp)
