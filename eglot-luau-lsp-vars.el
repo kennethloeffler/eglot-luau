@@ -40,6 +40,12 @@
   :prefix 'eglot-luau-lsp-
   :group 'tools)
 
+(defcustom eglot-luau-lsp-rojo-sourcemap-enabled
+  nil
+  "Whether to use Rojo to generate a sourcemap for projects."
+  :type 'boolean
+  :group 'eglot-luau-lsp)
+
 (defcustom eglot-luau-lsp-sourcemap-includes-non-scripts
   nil
   "Whether to tell Rojo to include non-script instances in its sourcemap."

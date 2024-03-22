@@ -137,9 +137,11 @@ If OUTPUT contains \"ERROR\", display the output in a pop-up buffer."
 (defun eglot-luau-lsp--rojo-process-handler (server &rest _)
   "Handle the Rojo process for SERVER.
 SERVER must have a language-id equal to \"luau\". Fails when Rojo
-is not installed, or when the project file cannot be found."
-  (if (and (string= (slot-value server 'language-id) "luau")
-           (executable-find "rojo"))
+is not installed, or when a file at
+`eglot-luau-lsp-rojo-project-path' cannot be found."
+  (if-let ((sourcemap-enabled eglot-luau-lsp-rojo-sourcemap-enabled)
+           (_is-luau-server (string= (slot-value server 'language-id) "luau"))
+           (is-rojo-installed (executable-find "rojo")))
       (let ((rojo-process (make-process
                            :name "luau-lsp-rojo-sourcemap"
                            :command (eglot-luau-lsp--build-rojo-command-list)
@@ -156,7 +158,12 @@ is not installed, or when the project file cannot be found."
                   (if (eq server server-shutting-down)
                       (progn (kill-process rojo-process)
                              (advice-remove 'eglot-shutdown "kill-rojo"))))
-         '((name . "kill-rojo"))))))
+         '((name . "kill-rojo"))))
+    (if (and sourcemap-enabled
+             (not is-rojo-installed))
+        (with-output-to-temp-buffer (get-buffer-create
+                                   "*luau-lsp Rojo sourcemap error*")
+        (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
 ;;;###autoload
 (defun eglot-luau-lsp-add-server-program ()
