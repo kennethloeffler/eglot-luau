@@ -46,7 +46,7 @@
   :type 'boolean
   :group 'eglot-luau-lsp)
 
-(defcustom eglot-luau-lsp-sourcemap-includes-non-scripts
+(defcustom eglot-luau-lsp-rojo-sourcemap-includes-non-scripts
   nil
   "Whether to tell Rojo to include non-script instances in its sourcemap."
   :type 'boolean

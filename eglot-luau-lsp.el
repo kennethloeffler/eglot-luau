@@ -122,7 +122,7 @@ docs files, respectively, need to be updated.  Respects the
                             "sourcemap" "rojo")))
     (push (expand-file-name eglot-luau-lsp-rojo-project-path)
           command-list)
-    (if eglot-luau-lsp-sourcemap-includes-non-scripts
+    (if eglot-luau-lsp-rojo-sourcemap-includes-non-scripts
         (push "--include-non-scripts" command-list))
     (nreverse command-list)))
 
