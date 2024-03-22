@@ -62,7 +62,8 @@
   "PluginSecurity"
   "The security level to use for Roblox API type defintions."
   :type 'string
-  :options '("None" "LocalUserSecurity" "PluginSecurity" "RobloxScriptSecurity"))
+  :options '("None" "LocalUserSecurity" "PluginSecurity" "RobloxScriptSecurity")
+  :group 'eglot-luau-lsp)
 
 (provide 'eglot-luau-lsp-vars)
 ;;; eglot-luau-lsp-vars.el ends here
