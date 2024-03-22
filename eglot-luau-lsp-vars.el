@@ -53,13 +53,13 @@
   :group 'eglot-luau-lsp)
 
 (defcustom eglot-luau-lsp-auto-update-roblox-types
-  t
+  nil
   "Whether to automatically update Roblox types on server initialization."
   :type 'boolean
   :group 'eglot-luau-lsp)
 
 (defcustom eglot-luau-lsp-auto-update-roblox-docs
-  t
+  nil
   "Whether to automatically update Roblox API docs on server initialization."
   :type 'boolean
   :group 'eglot-luau-lsp)
