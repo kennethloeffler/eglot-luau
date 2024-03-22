@@ -132,6 +132,14 @@ docs files, respectively, need to be updated.  Respects the
                `((lua-mode :language-id "luau")
                  . ,(eglot-luau-lsp--build-server-command-list))))
 
+(defun eglot-luau-lsp--rojo-process-filter (_process output)
+  "Process filter that displays any errors during Rojo sourcemap generation.
+If OUTPUT contains \"ERROR\", display the output in a pop-up buffer."
+  (if (string-match "ERROR" output)
+      (with-output-to-temp-buffer (get-buffer-create
+                                   "*luau-lsp Rojo sourcemap error*")
+        (princ output))))
+
 (defun eglot-luau-lsp--rojo-process-handler (server &rest _)
   "Handle the Rojo process for SERVER.
 SERVER must have a language-id equal to \"luau\". Fails when Rojo
@@ -141,6 +149,7 @@ is not installed, or when the project file cannot be found."
       (let ((rojo-process (make-process
                            :name "luau-lsp-rojo-sourcemap"
                            :command (eglot-luau-lsp--build-rojo-command-list)
+                           :filter #'eglot-luau-lsp--rojo-process-filter
                            :noquery t)))
         (advice-add
          'eglot-shutdown
