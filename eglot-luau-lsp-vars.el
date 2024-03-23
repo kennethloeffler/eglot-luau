@@ -77,5 +77,18 @@
   :type 'string
   :group 'eglot-luau-lsp)
 
+(defcustom eglot-luau-lsp-fflags-enabled
+  t
+  "Whether the language server will have FFlags enabled."
+  :type 'boolean
+  :group 'eglot-luau-lsp)
+
+(defcustom eglot-luau-lsp-custom-set-fflags
+  '(("oops" "lol"))
+  "Custom set FFlags passed to the language server."
+  :type '(alist :key-type (string :tag "Name")
+                :value-type (string :tag "Value"))
+  :group 'eglot-luau-lsp)
+
 (provide 'eglot-luau-lsp-vars)
 ;;; eglot-luau-lsp-vars.el ends here
