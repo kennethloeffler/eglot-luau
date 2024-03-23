@@ -77,13 +77,13 @@
   :type 'string
   :group 'eglot-luau-lsp)
 
-(defcustom eglot-luau-lsp-fflags-enabled
+(defcustom eglot-luau-lsp-flags-enabled
   t
   "Whether the language server will have FFlags enabled."
   :type 'boolean
   :group 'eglot-luau-lsp)
 
-(defcustom eglot-luau-lsp-custom-set-fflags
+(defcustom eglot-luau-lsp-custom-set-flags
   '(("oops" "lol"))
   "Custom set FFlags passed to the language server."
   :type '(alist :key-type (string :tag "Name")
