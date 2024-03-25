@@ -136,7 +136,7 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
           (mapconcat 'identity (eglot-luau-lsp--build-rojo-command-list) " ")
           output)))))
 
-(defun eglot-luau-lsp--rojo-process-handler (server &rest _)
+(defun eglot-luau-lsp--make-rojo-process (server &rest _)
   "Handle the Rojo process for SERVER.
 SERVER must have a language-id equal to \"luau\". Fails when Rojo
 is not installed, or when a file at
@@ -167,21 +167,6 @@ is not installed, or when a file at
                                      "*luau-lsp Rojo sourcemap error*")
           (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
-
-;;;###autoload
-(defun eglot-luau-lsp-update-roblox-docs ()
-  "Download and store latest Roblox API docs."
-  (with-temp-buffer
-    (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
-    (write-file (eglot-luau-lsp--roblox-docs-storage-uri))))
-
-;;;###autoload
-(defun eglot-luau-lsp-update-roblox-types ()
-  "Download and store latest Roblox type definitions."
-  (with-temp-buffer
-    (url-insert-file-contents (eglot-luau-lsp--roblox-types-url))
-    (write-file (eglot-luau-lsp--roblox-types-storage-uri))))
-
 ;;;###autoload
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for `lua-mode' buffers."
@@ -195,11 +180,18 @@ is not installed, or when a file at
   (pcase-let ((`(,types-need-update ,docs-need-update)
                (with-demoted-errors (eglot-luau-lsp--is-outdated))))
     (if types-need-update
-        (with-demoted-errors (eglot-luau-lsp-update-roblox-types)))
+        (with-temp-buffer
+          (with-demoted-errors
+              "Error: %s" (url-insert-file-contents
+                           (eglot-luau-lsp--roblox-types-url)))
+          (write-file (eglot-luau-lsp--roblox-types-storage-uri))))
     (if docs-need-update
-        (with-demoted-errors (eglot-luau-lsp-update-roblox-docs))))
-  (add-hook 'eglot-server-initialized-hook
-            #'eglot-luau-lsp--rojo-process-handler)
+        (with-temp-buffer
+          (with-demoted-errors
+              "Error: %s" (url-insert-file-contents
+                           eglot-luau-lsp-roblox-docs-url))
+          (write-file (eglot-luau-lsp--roblox-docs-storage-uri)))))
+  (add-hook 'eglot-server-initialized-hook #'eglot-luau-lsp--make-rojo-process)
   (eglot-luau-lsp-add-server-program))
 
 (provide 'eglot-luau-lsp)
