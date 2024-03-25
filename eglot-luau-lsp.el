@@ -182,15 +182,15 @@ is not installed, or when a file at
     (if types-need-update
         (with-temp-buffer
           (with-demoted-errors
-              "Error: %s" (url-insert-file-contents
-                           (eglot-luau-lsp--roblox-types-url)))
-          (write-file (eglot-luau-lsp--roblox-types-storage-uri))))
+              "Error: %s"
+            (url-insert-file-contents (eglot-luau-lsp--roblox-types-url))
+            (write-file (eglot-luau-lsp--roblox-types-storage-uri)))))
     (if docs-need-update
         (with-temp-buffer
           (with-demoted-errors
-              "Error: %s" (url-insert-file-contents
-                           eglot-luau-lsp-roblox-docs-url))
-          (write-file (eglot-luau-lsp--roblox-docs-storage-uri)))))
+              "Error: %s"
+            (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
+            (write-file (eglot-luau-lsp--roblox-docs-storage-uri))))))
   (add-hook 'eglot-server-initialized-hook #'eglot-luau-lsp--make-rojo-process)
   (eglot-luau-lsp-add-server-program))
 
