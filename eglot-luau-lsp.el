@@ -101,6 +101,12 @@ docs files, respectively, need to be updated.  Respects the
         (push (format "--definitions=%s" types-file) command-list))
     (if (file-exists-p docs-file)
         (push (format "--docs=%s" docs-file) command-list))
+    (if eglot-luau-lsp-custom-type-files
+        (dolist (file eglot-luau-lsp-custom-type-files)
+          (push (format "--definitions=%s" file) command-list)))
+    (if eglot-luau-lsp-custom-doc-files
+        (dolist (file eglot-luau-lsp-custom-doc-files)
+          (push (format "--docs=%s" file) command-list)))
     (if (not eglot-luau-lsp-flags-enabled)
         (push "--no-flags-enabled" command-list))
     (if eglot-luau-lsp-custom-set-flags

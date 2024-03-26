@@ -90,5 +90,17 @@
                 :value-type (string :tag "Value"))
   :group 'eglot-luau-lsp)
 
+(defcustom eglot-luau-lsp-custom-type-files
+  '()
+  "List of paths to type definition files to provide to the language server."
+  :type '(repeat string)
+  :group 'eglot-luau-lsp)
+
+(defcustom eglot-luau-lsp-custom-doc-files
+  '()
+  "List of paths to doc files to provide to the language server."
+  :type '(repeat string)
+  :group 'eglot-luau-lsp)
+
 (provide 'eglot-luau-lsp-vars)
 ;;; eglot-luau-lsp-vars.el ends here
