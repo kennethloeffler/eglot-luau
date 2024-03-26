@@ -143,7 +143,7 @@ SERVER must have a language-id equal to \"luau\". Fails when Rojo
 is not installed, or when a file at
 `eglot-luau-lsp-rojo-project-path' cannot be found."
   (if-let ((is-sourcemap-enabled eglot-luau-lsp-rojo-sourcemap-enabled)
-           (_is-luau-server (string= (slot-value server 'language-id) "luau"))
+           (is-luau-server (string= (slot-value server 'language-id) "luau"))
            (is-rojo-installed (executable-find "rojo")))
       (let ((rojo-process (make-process
                            :name "luau-lsp-rojo-sourcemap"
