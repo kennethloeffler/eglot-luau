@@ -179,7 +179,9 @@ is not installed, or when a file at
 (defun eglot-luau-lsp-setup ()
   "Add luau-lsp as a server program for eglot in `lua-mode' buffers."
   (pcase-let ((`(,types-need-update ,docs-need-update)
-               (with-demoted-errors (eglot-luau-lsp--is-outdated))))
+               (with-demoted-errors
+                   "Error while fetching Roblox version: %s"
+                 (eglot-luau-lsp--is-outdated))))
     (if types-need-update
         (with-temp-buffer
           (with-demoted-errors
