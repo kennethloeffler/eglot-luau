@@ -103,8 +103,9 @@ docs files, respectively, need to be updated.  Respects the
         (push (format "--docs=%s" docs-file) command-list))
     (if (not eglot-luau-lsp-flags-enabled)
         (push "--no-flags-enabled" command-list))
-    (dolist (flag eglot-luau-lsp-custom-set-flags)
-      (push (format "--flag:%s=%s" (car flag) (cadr flag)) command-list))
+    (if eglot-luau-lsp-custom-set-flags
+        (dolist (flag eglot-luau-lsp-custom-set-flags)
+          (push (format "--flag:%s=%s" (car flag) (cadr flag)) command-list)))
     (nreverse command-list)))
 
 (defun eglot-luau-lsp--build-rojo-command-list ()
