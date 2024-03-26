@@ -159,7 +159,8 @@ is not installed, or when a file at
          'eglot-shutdown
          :after (lambda (server-shutting-down &rest _)
                   (if (eq server server-shutting-down)
-                      (progn (kill-process rojo-process)
+                      (progn (if (process-live-p rojo-process)
+                                 (kill-process rojo-process))
                              (advice-remove 'eglot-shutdown "kill-rojo"))))
          '((name . "kill-rojo"))))
     (if (and is-sourcemap-enabled
