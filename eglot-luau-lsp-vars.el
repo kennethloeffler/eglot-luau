@@ -84,7 +84,7 @@
   :group 'eglot-luau-lsp)
 
 (defcustom eglot-luau-lsp-custom-set-flags
-  '(("oops" "lol"))
+  '()
   "Custom set FFlags passed to the language server."
   :type '(alist :key-type (string :tag "Name")
                 :value-type (string :tag "Value"))
