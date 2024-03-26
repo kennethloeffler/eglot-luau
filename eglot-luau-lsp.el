@@ -124,7 +124,7 @@ docs files, respectively, need to be updated.  Respects the
 If OUTPUT contains an error message, display the output in a pop-up buffer."
   (if (string-match "error" output)
       (with-output-to-temp-buffer (get-buffer-create
-                                   "*luau-lsp Rojo sourcemap error*")
+                                   "*luau-lsp sourcemap error*")
         (princ
          (format
           "eglot-luau-lsp attempted to generate a sourcemap using the following command:
@@ -165,7 +165,7 @@ is not installed, or when a file at
     (if (and is-sourcemap-enabled
              (not is-rojo-installed))
         (with-output-to-temp-buffer (get-buffer-create
-                                     "*luau-lsp Rojo sourcemap error*")
+                                     "*luau-lsp sourcemap error*")
           (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
 ;;;###autoload
