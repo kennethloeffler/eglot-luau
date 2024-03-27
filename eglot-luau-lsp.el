@@ -94,7 +94,7 @@ docs files, respectively, need to be updated.  Respects the
 
 (defun eglot-luau-lsp--build-server-command-list ()
   "Return a list of strings that used to spawn the luau-lsp server process."
-  (let ((command-list (list "lsp" "luau-lsp"))
+  (let ((command-list (list "lsp" eglot-luau-lsp-server-executable))
         (types-file (eglot-luau-lsp--roblox-types-storage-uri))
         (docs-file (eglot-luau-lsp--roblox-docs-storage-uri)))
     (if (file-exists-p types-file)

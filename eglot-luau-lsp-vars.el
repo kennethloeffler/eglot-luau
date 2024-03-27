@@ -102,5 +102,11 @@
   :type '(repeat string)
   :group 'eglot-luau-lsp)
 
+(defcustom eglot-luau-lsp-server-executable
+  "luau-lsp"
+  "Path to the luau-lsp server executable."
+  :type 'string
+  :group 'eglot-luau-lsp)
+
 (provide 'eglot-luau-lsp-vars)
 ;;; eglot-luau-lsp-vars.el ends here
