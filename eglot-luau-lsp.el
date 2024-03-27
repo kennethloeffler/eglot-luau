@@ -175,7 +175,6 @@ is not installed, or when a file at
                                      "*luau-lsp sourcemap error*")
           (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
-;;;###autoload
 (defun eglot-luau-lsp-add-server-program ()
   "Add luau-lsp as an eglot server program for `lua-mode' buffers."
   (add-to-list 'eglot-server-programs
