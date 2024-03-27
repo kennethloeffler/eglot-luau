@@ -4,37 +4,61 @@ eglot-luau is an Emacs package that adds support for the [Luau Lanuage Server](h
 
 ## Configuration
 
-The entry point to the package is the function `eglot-luau-setup`. This function should be called after eglot is loaded.
-
 eglot-luau provides the following customizable variables:
 
-* `eglot-luau-rojo-sourcemap-enabled`
+* `eglot-luau-rojo-sourcemap-enabled`: `boolean`
 
-* `eglot-luau-rojo-sourcemap-includes-non-scripts`
+	This variable determines whether eglot-luau will start a Rojo process to generate sourecemaps for the language server. The value of this variable is `nil` by default.
 
-* `eglot-luau-auto-update-roblox-types`
+* `eglot-luau-rojo-sourcemap-includes-non-scripts`: `boolean`
 
-* `eglot-luau-auto-update-roblox-docs`
+	This variable determines whether non-script instances are present in the Rojo sourcemap. The value of this variable is `nil` by default.
 
-* `eglot-luau-roblox-security-level`
+* `eglot-luau-auto-update-roblox-types`: `boolean`
 
-* `eglot-luau-rojo-project-path`
+	This variable determines whether `eglot-luau-setup` will attempt to download the latest Roblox type definitions. The value of this variable is `nil` by default.
 
-* `eglot-luau-fflags-enabled`
+* `eglot-luau-auto-update-roblox-docs`: `boolean`
 
-* `eglot-luau-fflag-overrides`
+	This variable determines whether `eglot-luau-setup` will attempt to download the latest Roblox docs. The value of this variable is `nil` by default.
 
-* `eglot-luau-sync-fflags`
+* `eglot-luau-roblox-security-level`: `string`
 
-* `eglot-luau-custom-type-files`
+	This variable determines the security level of type definitions downloaded when `eglot-luau-lsp-auto-update-roblox-types` is non-`nil`. The available options are `None`, `LocalUserSecurity`, `PluginSecurity`, and `RobloxScriptSecurity`. The value of this variable is `PluginSecurity` by default.
 
-* `eglot-luau-custom-doc-files`
+* `eglot-luau-rojo-project-path`: `string`
 
-* `eglot-luau-server-executable`
+	This variable determines the path passed to Rojo for sourcemap generation. The value of this variable is `default.project.json` by default.
+
+* `eglot-luau-fflags-enabled`: `boolean`
+
+	This variable determines whether the language server will have any FFlags enabled. The value of this variable is `t` by default.
+
+* `eglot-luau-fflag-overrides`: `alist`
+
+	This variable allows overriding FFlags. It is an alist mapping the names of FFlags to their desired values. An example value is ``(("LuauNonStrictByDefaultBetaFeature" "False"))`. The value of this variable is the empty list by default.
+
+* `eglot-luau-sync-fflags`: `boolean`
+
+	This variable determines whether `eglot-luau-setup` will attempt to download the latest Roblox FFlag configuration. The value of this variable is `t` by default.
+
+* `eglot-luau-custom-type-files`: `list`
+
+	This variable is a list of paths to custom type definition files to supply to the language server. The value of this variable is the empty list by default.
+
+* `eglot-luau-custom-doc-files`: `list`
+
+	This variable is a list of paths to custom doc files to supply to the language server. The value of this variable is the empty list by default.
+
+* `eglot-luau-server-executable`: `string`
+
+	This variable determines how to locate the language server. The value of this variable is `luau-lsp` by default (i.e. it assumes luau-lsp is on the PATH environment variable).
 
 eglot-luau is also configurable using LSP's "workspace configuration," as described in [the Eglot documentation](https://joaotavora.github.io/eglot/#Project_002dspecific-configuration-1).
 
-Below is a sample configuration using `use-package`:
+The entry point to the package is the function `eglot-luau-setup`. This function should be called after eglot is loaded.
+
+Below is a example configuration using `use-package`:
 
 ```elisp
 (use-package eglot-luau
@@ -54,4 +78,4 @@ Below is a sample configuration using `use-package`:
 
 ## Known issues
 
-`end` completion does not work. This seems to be a deeper issue in eglot that causes `\n` to be unusable as a trigger character. Since luau-lsp is hardcoded to use `\n` as a trigger character for `end` completion, this is not very straightforward to fix.
+`end` completion does not work. This seems to be caused by a deeper issue in eglot that causes `\n` to be unusable as a trigger character. Since luau-lsp is hardcoded to use `\n` as a trigger character for `end` completion, this is not very straightforward to fix.
