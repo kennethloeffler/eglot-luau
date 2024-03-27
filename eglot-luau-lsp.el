@@ -1,4 +1,4 @@
-;;; eglot-luau-lsp.el --- eglot client for luau-lsp -*- lexical-binding: t; -*-
+;;; eglot-luau-lsp.el --- Luau language server integration for eglot -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024 Kenneth Loeffler
 
