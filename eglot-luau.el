@@ -30,10 +30,10 @@
 ;;; Code:
 (require 'eglot-luau-vars)
 
-(defun eglot-luau--ensure-storage ()
+(defun eglot-luau--ensure-storage-directory ()
   "Create luau-lsp storage folder if it doesn't exist."
-  (if (not (file-directory-p eglot-luau-storage-location))
-      (make-directory eglot-luau-storage-location)))
+  (if (not (file-directory-p eglot-luau-storage-directory))
+      (make-directory eglot-luau-storage-directory)))
 
 (defun eglot-luau--roblox-types-url ()
   "Return a URL that responds with Roblox type information."
@@ -43,18 +43,18 @@
 
 (defun eglot-luau--roblox-types-storage-uri ()
   "Return where to store type definition files."
-  (expand-file-name (concat eglot-luau-storage-location
+  (expand-file-name (concat eglot-luau-storage-directory
                             (format "roblox-global-types-%s"
                                     eglot-luau-roblox-security-level))))
 
 (defun eglot-luau--roblox-docs-storage-uri ()
   "Return where to store doc files."
-  (expand-file-name (concat eglot-luau-storage-location "roblox-api-docs")))
+  (expand-file-name (concat eglot-luau-storage-directory "roblox-api-docs")))
 
 
 (defun eglot-luau--roblox-version-storage-uri ()
   "Return where to store version files."
-  (expand-file-name (concat eglot-luau-storage-location "roblox-version")))
+  (expand-file-name (concat eglot-luau-storage-directory "roblox-version")))
 
 (defun eglot-luau--which-files-need-update ()
   "Return a list of bools that indicate which Roblox resources should be updated.
@@ -76,7 +76,7 @@ docs files, respectively, need to be updated.  Respects the
       ;; Don't do anything if user doesn't want Roblox types or docs
       '(nil nil)
     (progn
-      (eglot-luau--ensure-storage)
+      (eglot-luau--ensure-storage-directory)
       (with-temp-buffer
         (url-insert-file-contents eglot-luau-roblox-version-url)
         (let ((version-file (eglot-luau--roblox-version-storage-uri)))

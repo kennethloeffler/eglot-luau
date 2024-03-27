@@ -23,7 +23,7 @@
 ;;; Code:
 
 ;; Storage directory for type definition and doc resource files
-(defconst eglot-luau-storage-location "~/.emacs.d/luau-lsp-storage/")
+(defconst eglot-luau-storage-directory "~/.emacs.d/luau-lsp-storage/")
 
 ;; URL providing Roblox API docs
 (defconst eglot-luau-roblox-docs-url "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/api-docs/en-us.json")
