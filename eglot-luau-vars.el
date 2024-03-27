@@ -83,7 +83,7 @@
   :type 'boolean
   :group 'eglot-luau)
 
-(defcustom eglot-luau-custom-set-fflags
+(defcustom eglot-luau-fflag-overrides
   '()
   "Custom set FFlags passed to the language server."
   :type '(alist :key-type (string :tag "Name")

@@ -109,8 +109,8 @@ docs files, respectively, need to be updated.  Respects the
           (push (format "--docs=%s" file) command-list)))
     (if (not eglot-luau-fflags-enabled)
         (push "--no-flags-enabled" command-list))
-    (if eglot-luau-custom-set-fflags
-        (dolist (fflag eglot-luau-custom-set-fflags)
+    (if eglot-luau-fflag-overrides
+        (dolist (fflag eglot-luau-fflag-overrides)
           (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
     (nreverse command-list)))
 
