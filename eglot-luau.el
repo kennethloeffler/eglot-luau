@@ -28,6 +28,8 @@
 ;; (https://github.com/JohnnyMorganz/luau-lsp) integration for eglot.
 
 ;;; Code:
+(require 'json)
+
 (require 'eglot-luau-vars)
 
 (defun eglot-luau--ensure-storage-directory ()
@@ -94,13 +96,13 @@ docs files, respectively, need to be updated.  Respects the
 
 (defun eglot-luau--build-server-command-list ()
   "Return a list of strings that used to spawn the luau-lsp server process."
-  (let ((command-list (list "lsp" eglot-luau-server-executable))
-        (types-file (eglot-luau--roblox-types-storage-uri))
-        (docs-file (eglot-luau--roblox-docs-storage-uri)))
-    (if (file-exists-p types-file)
-        (push (format "--definitions=%s" types-file) command-list))
-    (if (file-exists-p docs-file)
-        (push (format "--docs=%s" docs-file) command-list))
+  (let ((command-list (list "lsp" eglot-luau-server-executable)))
+    (let ((types-uri (eglot-luau--roblox-types-storage-uri))
+          (docs-uri (eglot-luau--roblox-docs-storage-uri)))
+      (if (file-exists-p types-uri)
+          (push (format "--definitions=%s" types-uri) command-list))
+      (if (file-exists-p docs-uri)
+          (push (format "--docs=%s" docs-uri) command-list)))
     (if eglot-luau-custom-type-files
         (dolist (file eglot-luau-custom-type-files)
           (push (format "--definitions=%s" file) command-list)))
@@ -112,6 +114,20 @@ docs files, respectively, need to be updated.  Respects the
     (if eglot-luau-fflag-overrides
         (dolist (fflag eglot-luau-fflag-overrides)
           (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
+    (if eglot-luau-sync-fflags
+        (let ((fflags (cdar (with-temp-buffer
+                              (url-insert-file-contents
+                               eglot-luau-current-roblox-fflags-url)
+                              (json-read)))))
+          (dolist (fflag fflags)
+            (let* ((name (symbol-name (car fflag)))
+                   (trimmed-name (if (string-prefix-p "FFlagLuau" name)
+                                     (string-trim-left name "FFlag")
+                                   name))
+                   (value (cdr fflag)))
+              (if (not (assoc trimmed-name eglot-luau-fflag-overrides))
+                  (push (format "--flag:%s=%s" trimmed-name value)
+                        command-list))))))
     (nreverse command-list)))
 
 (defun eglot-luau--build-rojo-command-list ()

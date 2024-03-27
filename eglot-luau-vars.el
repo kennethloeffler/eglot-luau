@@ -31,6 +31,10 @@
 ;; URL providing latest Roblox version
 (defconst eglot-luau-roblox-version-url "https://raw.githubusercontent.com/CloneTrooper1019/Roblox-Client-Tracker/roblox/version.txt")
 
+;; URL providing Roblox's current Luau FFlag configuration
+(defconst eglot-luau-current-roblox-fflags-url
+  "https://clientsettingscdn.roblox.com/v1/settings/application?applicationName=PCDesktopClient")
+
 ;; Forward declare eglot variables to silence warnings
 (defvar eglot-server-programs)
 
@@ -107,6 +111,12 @@
   "Path to the luau-lsp server executable."
   :type 'string
   :group 'eglot-luau)
+
+(defcustom eglot-luau-sync-fflags
+  t
+  "Whether to sync Luau FFlags with Roblox's current configuration."
+  :type 'boolean
+  :group 'eglot-lua)
 
 (provide 'eglot-luau-vars)
 ;;; eglot-luau-vars.el ends here
