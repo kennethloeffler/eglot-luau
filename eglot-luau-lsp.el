@@ -175,12 +175,6 @@ is not installed, or when a file at
                                      "*luau-lsp sourcemap error*")
           (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
-(defun eglot-luau-lsp-add-server-program ()
-  "Add luau-lsp as an eglot server program for `lua-mode' buffers."
-  (add-to-list 'eglot-server-programs
-               `((lua-mode :language-id "luau")
-                 . ,(eglot-luau-lsp--build-server-command-list))))
-
 ;;;###autoload
 (defun eglot-luau-lsp-setup ()
   "Add luau-lsp as a server program for eglot in `lua-mode' buffers."
@@ -201,7 +195,9 @@ is not installed, or when a file at
             (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
             (write-file (eglot-luau-lsp--roblox-docs-storage-uri))))))
   (add-hook 'eglot-server-initialized-hook #'eglot-luau-lsp--make-rojo-process)
-  (eglot-luau-lsp-add-server-program))
+  (add-to-list 'eglot-server-programs
+               `((lua-mode :language-id "luau")
+                 . ,(eglot-luau-lsp--build-server-command-list))))
 
 (provide 'eglot-luau-lsp)
 ;;; eglot-luau-lsp.el ends here
