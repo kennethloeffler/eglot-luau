@@ -177,7 +177,13 @@ is not installed, or when a file at
 
 ;;;###autoload
 (defun eglot-luau-lsp-setup ()
-  "Add luau-lsp as a server program for eglot in `lua-mode' buffers."
+  "Set up luau-lsp for use in `lua-mode' buffers.
+If `eglot-luau-lsp-auto-update-roblox-types' and/or
+`eglot-luau-lsp-auto-update-roblox-docs' are non-nil, attempt to
+download latest Roblox type defintions and/or docs.
+
+If `eglot-luau-lsp-rojo-sourcemap-enabled' is non-nil, attempt to
+start a Rojo process to generate a sourcemap."
   (pcase-let ((`(,types-need-update ,docs-need-update)
                (with-demoted-errors
                    "Error while fetching Roblox version: %s"
