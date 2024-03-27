@@ -1,11 +1,11 @@
-;;; eglot-luau-lsp.el --- Luau language server integration for eglot -*- lexical-binding: t; -*-
+;;; eglot-luau.el --- Luau language server integration for eglot -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024 Kenneth Loeffler
 
 ;; Author: Kenneth Loeffler <kenloef@gmail.com>
 ;; Version: 0.1.0
 ;; Keywords: roblox, luau, tools
-;; URL: https://github.com/kennethloeffler/eglot-luau-lsp
+;; URL: https://github.com/kennethloeffler/eglot-luau
 ;; Package-Requires: ((emacs "29.1"))
 
 ;; This file is not part of GNU Emacs.
@@ -28,104 +28,104 @@
 ;; (https://github.com/JohnnyMorganz/luau-lsp) integration for eglot.
 
 ;;; Code:
-(require 'eglot-luau-lsp-vars)
+(require 'eglot-luau-vars)
 
-(defun eglot-luau-lsp--ensure-storage ()
+(defun eglot-luau--ensure-storage ()
   "Create luau-lsp storage folder if it doesn't exist."
-  (if (not (file-directory-p eglot-luau-lsp-storage-location))
-      (make-directory eglot-luau-lsp-storage-location)))
+  (if (not (file-directory-p eglot-luau-storage-location))
+      (make-directory eglot-luau-storage-location)))
 
-(defun eglot-luau-lsp--roblox-types-url ()
+(defun eglot-luau--roblox-types-url ()
   "Return a URL that responds with Roblox type information."
   (format
    "http://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.%s.d.luau"
-   eglot-luau-lsp-roblox-security-level))
+   eglot-luau-roblox-security-level))
 
-(defun eglot-luau-lsp--roblox-types-storage-uri ()
+(defun eglot-luau--roblox-types-storage-uri ()
   "Return where to store type definition files."
-  (expand-file-name (concat eglot-luau-lsp-storage-location
+  (expand-file-name (concat eglot-luau-storage-location
                             (format "roblox-global-types-%s"
-                                    eglot-luau-lsp-roblox-security-level))))
+                                    eglot-luau-roblox-security-level))))
 
-(defun eglot-luau-lsp--roblox-docs-storage-uri ()
+(defun eglot-luau--roblox-docs-storage-uri ()
   "Return where to store doc files."
-  (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-api-docs")))
+  (expand-file-name (concat eglot-luau-storage-location "roblox-api-docs")))
 
 
-(defun eglot-luau-lsp--roblox-version-storage-uri ()
+(defun eglot-luau--roblox-version-storage-uri ()
   "Return where to store version files."
-  (expand-file-name (concat eglot-luau-lsp-storage-location "roblox-version")))
+  (expand-file-name (concat eglot-luau-storage-location "roblox-version")))
 
-(defun eglot-luau-lsp--which-files-need-update ()
+(defun eglot-luau--which-files-need-update ()
   "Return a list of bools that indicate which Roblox resources should be updated.
 Each bool in the list indicates whether the types or docs file
 need updates, respectively."
-  (list (and eglot-luau-lsp-auto-update-roblox-types
-             (not (file-exists-p (eglot-luau-lsp--roblox-types-storage-uri))))
-        (and eglot-luau-lsp-auto-update-roblox-docs
-             (not (file-exists-p (eglot-luau-lsp--roblox-docs-storage-uri))))))
+  (list (and eglot-luau-auto-update-roblox-types
+             (not (file-exists-p (eglot-luau--roblox-types-storage-uri))))
+        (and eglot-luau-auto-update-roblox-docs
+             (not (file-exists-p (eglot-luau--roblox-docs-storage-uri))))))
 
-(defun eglot-luau-lsp--is-outdated ()
+(defun eglot-luau--is-outdated ()
   "Compare versions of locally stored Roblox docs/types with the latest versions.
 Return a list of bools that indicate whether the types and/or
 docs files, respectively, need to be updated.  Respects the
-`eglot-luau-lsp-auto-update-roblox-types' and
-`eglot-luau-lsp-auto-update-roblox-docs' settings."
-  (if (not (or eglot-luau-lsp-auto-update-roblox-types
-               eglot-luau-lsp-auto-update-roblox-docs))
+`eglot-luau-auto-update-roblox-types' and
+`eglot-luau-auto-update-roblox-docs' settings."
+  (if (not (or eglot-luau-auto-update-roblox-types
+               eglot-luau-auto-update-roblox-docs))
       ;; Don't do anything if user doesn't want Roblox types or docs
       '(nil nil)
     (progn
-      (eglot-luau-lsp--ensure-storage)
+      (eglot-luau--ensure-storage)
       (with-temp-buffer
-        (url-insert-file-contents eglot-luau-lsp-roblox-version-url)
-        (let ((version-file (eglot-luau-lsp--roblox-version-storage-uri)))
+        (url-insert-file-contents eglot-luau-roblox-version-url)
+        (let ((version-file (eglot-luau--roblox-version-storage-uri)))
           (if (file-exists-p version-file)
               (let ((stored-version (with-temp-buffer
                                       (insert-file-contents version-file)
                                       (buffer-string))))
                 (if (not (string= stored-version (buffer-string)))
-                    (list eglot-luau-lsp-auto-update-roblox-types
-                          eglot-luau-lsp-auto-update-roblox-docs)
-                  (eglot-luau-lsp--which-files-need-update)))
+                    (list eglot-luau-auto-update-roblox-types
+                          eglot-luau-auto-update-roblox-docs)
+                  (eglot-luau--which-files-need-update)))
             (progn
               (write-file version-file)
-              (eglot-luau-lsp--which-files-need-update))))))))
+              (eglot-luau--which-files-need-update))))))))
 
-(defun eglot-luau-lsp--build-server-command-list ()
+(defun eglot-luau--build-server-command-list ()
   "Return a list of strings that used to spawn the luau-lsp server process."
-  (let ((command-list (list "lsp" eglot-luau-lsp-server-executable))
-        (types-file (eglot-luau-lsp--roblox-types-storage-uri))
-        (docs-file (eglot-luau-lsp--roblox-docs-storage-uri)))
+  (let ((command-list (list "lsp" eglot-luau-server-executable))
+        (types-file (eglot-luau--roblox-types-storage-uri))
+        (docs-file (eglot-luau--roblox-docs-storage-uri)))
     (if (file-exists-p types-file)
         (push (format "--definitions=%s" types-file) command-list))
     (if (file-exists-p docs-file)
         (push (format "--docs=%s" docs-file) command-list))
-    (if eglot-luau-lsp-custom-type-files
-        (dolist (file eglot-luau-lsp-custom-type-files)
+    (if eglot-luau-custom-type-files
+        (dolist (file eglot-luau-custom-type-files)
           (push (format "--definitions=%s" file) command-list)))
-    (if eglot-luau-lsp-custom-doc-files
-        (dolist (file eglot-luau-lsp-custom-doc-files)
+    (if eglot-luau-custom-doc-files
+        (dolist (file eglot-luau-custom-doc-files)
           (push (format "--docs=%s" file) command-list)))
-    (if (not eglot-luau-lsp-flags-enabled)
+    (if (not eglot-luau-flags-enabled)
         (push "--no-flags-enabled" command-list))
-    (if eglot-luau-lsp-custom-set-flags
-        (dolist (flag eglot-luau-lsp-custom-set-flags)
+    (if eglot-luau-custom-set-flags
+        (dolist (flag eglot-luau-custom-set-flags)
           (push (format "--flag:%s=%s" (car flag) (cadr flag)) command-list)))
     (nreverse command-list)))
 
-(defun eglot-luau-lsp--build-rojo-command-list ()
+(defun eglot-luau--build-rojo-command-list ()
   "Return a list of strings that can be used to start the Rojo process."
   (let ((command-list (list "--watch"
                             "sourcemap.json" "--output"
                             "sourcemap" "rojo")))
-    (push (expand-file-name eglot-luau-lsp-rojo-project-path)
+    (push (expand-file-name eglot-luau-rojo-project-path)
           command-list)
-    (if eglot-luau-lsp-rojo-sourcemap-includes-non-scripts
+    (if eglot-luau-rojo-sourcemap-includes-non-scripts
         (push "--include-non-scripts" command-list))
     (nreverse command-list)))
 
-(defun eglot-luau-lsp--rojo-process-filter (_process output)
+(defun eglot-luau--rojo-process-filter (_process output)
   "Process filter that displays any errors during Rojo sourcemap generation.
 If OUTPUT contains an error message, display the output in a pop-up buffer."
   (if (string-match "error" output)
@@ -133,28 +133,28 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
                                    "*luau-lsp sourcemap error*")
         (princ
          (format
-          "eglot-luau-lsp attempted to generate a sourcemap using the following command:
+          "eglot-luau attempted to generate a sourcemap using the following command:
 
 %s
 
 ...but the command outputted an error:
 
 %s"
-          (mapconcat 'identity (eglot-luau-lsp--build-rojo-command-list) " ")
+          (mapconcat 'identity (eglot-luau--build-rojo-command-list) " ")
           output)))))
 
-(defun eglot-luau-lsp--make-rojo-process (server &rest _)
+(defun eglot-luau--make-rojo-process (server &rest _)
   "Handle the Rojo process for SERVER.
 SERVER must have a language-id equal to \"luau\". Fails when Rojo
 is not installed, or when a file at
-`eglot-luau-lsp-rojo-project-path' cannot be found."
-  (if-let ((is-sourcemap-enabled eglot-luau-lsp-rojo-sourcemap-enabled)
+`eglot-luau-rojo-project-path' cannot be found."
+  (if-let ((is-sourcemap-enabled eglot-luau-rojo-sourcemap-enabled)
            (is-luau-server (string= (slot-value server 'language-id) "luau"))
            (is-rojo-installed (executable-find "rojo")))
       (let ((rojo-process (make-process
                            :name "luau-lsp-rojo-sourcemap"
-                           :command (eglot-luau-lsp--build-rojo-command-list)
-                           :filter #'eglot-luau-lsp--rojo-process-filter
+                           :command (eglot-luau--build-rojo-command-list)
+                           :filter #'eglot-luau--rojo-process-filter
                            :noquery t)))
         ;; eglot does not provide any hooks for server shutdown, so to
         ;; know when to kill the Rojo process, we have to advise
@@ -173,37 +173,37 @@ is not installed, or when a file at
              (not is-rojo-installed))
         (with-output-to-temp-buffer (get-buffer-create
                                      "*luau-lsp sourcemap error*")
-          (princ "eglot-luau-lsp-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
+          (princ "eglot-luau-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
 ;;;###autoload
-(defun eglot-luau-lsp-setup ()
+(defun eglot-luau-setup ()
   "Set up luau-lsp for use in `lua-mode' buffers.
-If `eglot-luau-lsp-auto-update-roblox-types' and/or
-`eglot-luau-lsp-auto-update-roblox-docs' are non-nil, attempt to
+If `eglot-luau-auto-update-roblox-types' and/or
+`eglot-luau-auto-update-roblox-docs' are non-nil, attempt to
 download latest Roblox type defintions and/or docs.
 
-If `eglot-luau-lsp-rojo-sourcemap-enabled' is non-nil, attempt to
+If `eglot-luau-rojo-sourcemap-enabled' is non-nil, attempt to
 start a Rojo process to generate a sourcemap."
   (pcase-let ((`(,types-need-update ,docs-need-update)
                (with-demoted-errors
                    "Error while fetching Roblox version: %s"
-                 (eglot-luau-lsp--is-outdated))))
+                 (eglot-luau--is-outdated))))
     (if types-need-update
         (with-temp-buffer
           (with-demoted-errors
               "Error while updating Roblox global types: %s"
-            (url-insert-file-contents (eglot-luau-lsp--roblox-types-url))
-            (write-file (eglot-luau-lsp--roblox-types-storage-uri)))))
+            (url-insert-file-contents (eglot-luau--roblox-types-url))
+            (write-file (eglot-luau--roblox-types-storage-uri)))))
     (if docs-need-update
         (with-temp-buffer
           (with-demoted-errors
               "Error while updating Roblox docs: %s"
-            (url-insert-file-contents eglot-luau-lsp-roblox-docs-url)
-            (write-file (eglot-luau-lsp--roblox-docs-storage-uri))))))
-  (add-hook 'eglot-server-initialized-hook #'eglot-luau-lsp--make-rojo-process)
+            (url-insert-file-contents eglot-luau-roblox-docs-url)
+            (write-file (eglot-luau--roblox-docs-storage-uri))))))
+  (add-hook 'eglot-server-initialized-hook #'eglot-luau--make-rojo-process)
   (add-to-list 'eglot-server-programs
                `((lua-mode :language-id "luau")
-                 . ,(eglot-luau-lsp--build-server-command-list))))
+                 . ,(eglot-luau--build-server-command-list))))
 
-(provide 'eglot-luau-lsp)
-;;; eglot-luau-lsp.el ends here
+(provide 'eglot-luau)
+;;; eglot-luau.el ends here
