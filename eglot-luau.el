@@ -107,11 +107,11 @@ docs files, respectively, need to be updated.  Respects the
     (if eglot-luau-custom-doc-files
         (dolist (file eglot-luau-custom-doc-files)
           (push (format "--docs=%s" file) command-list)))
-    (if (not eglot-luau-flags-enabled)
+    (if (not eglot-luau-fflags-enabled)
         (push "--no-flags-enabled" command-list))
-    (if eglot-luau-custom-set-flags
-        (dolist (flag eglot-luau-custom-set-flags)
-          (push (format "--flag:%s=%s" (car flag) (cadr flag)) command-list)))
+    (if eglot-luau-custom-set-fflags
+        (dolist (fflag eglot-luau-custom-set-fflags)
+          (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
     (nreverse command-list)))
 
 (defun eglot-luau--build-rojo-command-list ()
