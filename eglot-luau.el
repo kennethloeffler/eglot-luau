@@ -28,9 +28,102 @@
 ;; (https://github.com/JohnnyMorganz/luau-lsp) integration for eglot.
 
 ;;; Code:
+(require 'eglot)
 (require 'json)
 
-(require 'eglot-luau-vars)
+;; Storage directory for type definition and doc resource files
+(defconst eglot-luau-storage-directory (concat user-emacs-directory
+                                               "luau-lsp-storage/"))
+
+;; URL providing Roblox API docs
+(defconst eglot-luau-roblox-docs-url "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/api-docs/en-us.json")
+
+;; URL providing latest Roblox version
+(defconst eglot-luau-roblox-version-url "https://raw.githubusercontent.com/CloneTrooper1019/Roblox-Client-Tracker/roblox/version.txt")
+
+;; URL providing Roblox's current Luau FFlag configuration
+(defconst eglot-luau-current-roblox-fflags-url
+  "https://clientsettingscdn.roblox.com/v1/settings/application?applicationName=PCDesktopClient")
+
+;; User customization
+(defgroup eglot-luau nil
+  "Customization for luau-lsp."
+  :prefix 'eglot-luau-
+  :group 'tools)
+
+(defcustom eglot-luau-rojo-sourcemap-enabled
+  nil
+  "Whether to use Rojo to generate a sourcemap for projects."
+  :type 'boolean
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-rojo-sourcemap-includes-non-scripts
+  nil
+  "Whether to tell Rojo to include non-script instances in its sourcemap."
+  :type 'boolean
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-auto-update-roblox-types
+  nil
+  "Whether to automatically update Roblox types on server initialization."
+  :type 'boolean
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-auto-update-roblox-docs
+  nil
+  "Whether to automatically update Roblox API docs on server initialization."
+  :type 'boolean
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-roblox-security-level
+  "PluginSecurity"
+  "The security level to use for Roblox API type defintions."
+  :type 'string
+  :options '("None" "LocalUserSecurity" "PluginSecurity" "RobloxScriptSecurity")
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-rojo-project-path
+  "default.project.json"
+  "A relative path to the Rojo project to use for sourcemap generation."
+  :type 'string
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-fflags-enabled
+  t
+  "Whether the language server will have any FFlags enabled."
+  :type 'boolean
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-fflag-overrides
+  '()
+  "Custom set FFlags passed to the language server."
+  :type '(alist :key-type (string :tag "Name")
+                :value-type (string :tag "Value"))
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-custom-type-files
+  '()
+  "List of paths to type definition files to provide to the language server."
+  :type '(repeat string)
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-custom-doc-files
+  '()
+  "List of paths to doc files to provide to the language server."
+  :type '(repeat string)
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-server-executable
+  "luau-lsp"
+  "Path to the luau-lsp server executable."
+  :type 'string
+  :group 'eglot-luau)
+
+(defcustom eglot-luau-sync-fflags
+  t
+  "Whether to sync Luau FFlags with Roblox's current configuration."
+  :type 'boolean
+  :group 'eglot-lua)
 
 (defun eglot-luau--ensure-storage-directory ()
   "Create luau-lsp storage folder if it doesn't exist."

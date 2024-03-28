@@ -71,7 +71,6 @@ Below is a example configuration using `use-package`:
   (eglot-luau-rojo-sourcemap-includes-non-scripts t)
   (eglot-luau-auto-update-roblox-docs t)
   (eglot-luau-auto-update-roblox-types t)
-  (eglot-luau-server-executable "~/projects/programming/luau-lsp/build/luau-lsp")
   (eglot-luau-fflag-overrides '(("LuauNonStrictByDefaultBetaFeature" "False")))
   :hook (lua-mode . eglot-ensure))
 ```
@@ -79,3 +78,5 @@ Below is a example configuration using `use-package`:
 ## Known issues
 
 `end` completion does not work. This seems to be caused by a deeper issue in eglot that causes `\n` to be unusable as a trigger character. Since luau-lsp is hardcoded to use `\n` as a trigger character for `end` completion, this is not very straightforward to fix.
+
+Additionally, eglot-luau does not support bytecode generation, not does it support luau-lsp's Roblox Studio companion plugin.
