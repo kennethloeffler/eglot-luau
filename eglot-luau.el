@@ -279,6 +279,7 @@ is not installed, or when a file at
                              (advice-remove 'eglot-shutdown "kill-rojo"))))
          '((name . "kill-rojo"))))
     (if (and is-sourcemap-enabled
+             is-luau-server
              (not is-rojo-installed))
         (with-output-to-temp-buffer (get-buffer-create
                                      "*luau-lsp sourcemap error*")
