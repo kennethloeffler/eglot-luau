@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024 Kenneth Loeffler
 
 ;; Author: Kenneth Loeffler <kenloef@gmail.com>
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Keywords: roblox, luau, tools
 ;; URL: https://github.com/kennethloeffler/eglot-luau
 ;; Package-Requires: ((emacs "29.1"))
