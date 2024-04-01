@@ -258,11 +258,13 @@ is not installed, or when a file at
   (if-let ((is-sourcemap-enabled eglot-luau-rojo-sourcemap-enabled)
            (is-luau-server (string= (slot-value server 'language-id) "luau"))
            (is-rojo-installed (executable-find "rojo")))
-      (let ((rojo-process (make-process
-                           :name "luau-lsp-rojo-sourcemap"
-                           :command (eglot-luau--build-rojo-command-list)
-                           :filter #'eglot-luau--rojo-process-filter
-                           :noquery t)))
+      (let* ((rojo-process (make-process
+                            :name "luau-lsp-rojo-sourcemap"
+                            :command (eglot-luau--build-rojo-command-list)
+                            :filter #'eglot-luau--rojo-process-filter
+                            :noquery t))
+             (advice-name (concat (process-name rojo-process)
+                                  "-shutdown-advice")))
         ;; eglot does not provide any hooks for server shutdown, so to
         ;; know when to kill the Rojo process, we have to advise
         ;; `eglot-shutdown' temporarily. This is a bit ugly and goes
@@ -274,8 +276,8 @@ is not installed, or when a file at
                   (when (eq server server-shutting-down)
                     (if (process-live-p rojo-process)
                         (kill-process rojo-process))
-                    (advice-remove #'eglot-shutdown "kill-rojo")))
-         '((name . "kill-rojo"))))
+                    (advice-remove #'eglot-shutdown advice-name)))
+         '((name . advice-name))))
     (if (and is-sourcemap-enabled
              is-luau-server
              (not is-rojo-installed))
