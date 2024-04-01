@@ -170,22 +170,20 @@ docs files, respectively, need to be updated.  Respects the
                eglot-luau-auto-update-roblox-docs))
       ;; Don't do anything if user doesn't want Roblox types or docs
       '(nil nil)
-    (progn
-      (eglot-luau--ensure-storage-directory)
-      (with-temp-buffer
-        (url-insert-file-contents eglot-luau-roblox-version-url)
-        (let ((version-file (eglot-luau--roblox-version-storage-uri)))
-          (if (file-exists-p version-file)
-              (let ((stored-version (with-temp-buffer
-                                      (insert-file-contents version-file)
-                                      (buffer-string))))
-                (if (not (string= stored-version (buffer-string)))
-                    (list eglot-luau-auto-update-roblox-types
-                          eglot-luau-auto-update-roblox-docs)
-                  (eglot-luau--which-files-need-update)))
-            (progn
-              (write-file version-file)
-              (eglot-luau--which-files-need-update))))))))
+    (eglot-luau--ensure-storage-directory)
+    (with-temp-buffer
+      (url-insert-file-contents eglot-luau-roblox-version-url)
+      (let ((version-file (eglot-luau--roblox-version-storage-uri)))
+        (if (file-exists-p version-file)
+            (let ((stored-version (with-temp-buffer
+                                    (insert-file-contents version-file)
+                                    (buffer-string))))
+              (if (not (string= stored-version (buffer-string)))
+                  (list eglot-luau-auto-update-roblox-types
+                        eglot-luau-auto-update-roblox-docs)
+                (eglot-luau--which-files-need-update)))
+          (write-file version-file)
+          (eglot-luau--which-files-need-update))))))
 
 (defun eglot-luau--build-server-command-list ()
   "Return a list of strings that used to spawn the luau-lsp server process."
