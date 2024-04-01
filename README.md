@@ -1,4 +1,4 @@
-# eglot-luau
+# eglot-luau [![MELPA](https://melpa.org/packages/eglot-luau-badge.svg)](https://melpa.org/#/eglot-luau)
 
 eglot-luau is an Emacs package that adds support for the [Luau Lanuage Server](https://github.com/JohnnyMorganz/luau-lsp) to [eglot](https://github.com/joaotavora/eglot).
 
