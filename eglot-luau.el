@@ -173,16 +173,15 @@ docs files, respectively, need to be updated.  Respects the
     (eglot-luau--ensure-storage-directory)
     (with-temp-buffer
       (url-insert-file-contents eglot-luau-roblox-version-url)
-      (let ((version-file (eglot-luau--roblox-version-storage-uri)))
-        (if (file-exists-p version-file)
-            (let ((stored-version (with-temp-buffer
-                                    (insert-file-contents version-file)
-                                    (buffer-string))))
-              (if (not (string= stored-version (buffer-string)))
-                  (list eglot-luau-auto-update-roblox-types
-                        eglot-luau-auto-update-roblox-docs)
-                (eglot-luau--which-files-need-update)))
-          (write-file version-file)
+      (let* ((version-file (eglot-luau--roblox-version-storage-uri))
+             (stored-version (if (file-exists-p version-file)
+                                 (with-temp-buffer (insert-file-contents version-file)
+                                                   (buffer-string))
+                               "")))
+        (write-file version-file)
+        (if (not (string= stored-version (buffer-string)))
+            (list eglot-luau-auto-update-roblox-types
+                  eglot-luau-auto-update-roblox-docs)
           (eglot-luau--which-files-need-update))))))
 
 (defun eglot-luau--build-server-command-list ()
