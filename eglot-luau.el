@@ -3,10 +3,10 @@
 ;; Copyright (C) 2024 Kenneth Loeffler
 
 ;; Author: Kenneth Loeffler <kenloef@gmail.com>
-;; Version: 0.1.2
+;; Version: 0.2.2
 ;; Keywords: roblox, luau, tools
 ;; URL: https://github.com/kennethloeffler/eglot-luau
-;; Package-Requires: ((emacs "29.1"))
+;; Package-Requires: ((emacs "29.1") (eglot "1.17"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -253,11 +253,11 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
 
 (defun eglot-luau--make-rojo-process (server &rest _)
   "Handle the Rojo process for SERVER.
-SERVER must have a language-id equal to \"luau\". Fails when Rojo
-is not installed, or when a file at
-`eglot-luau-rojo-project-path' cannot be found."
+SERVER must support luau in `lua-mode' buffers.  Fails when Rojo
+ is not installed, or when a file at
+ `eglot-luau-rojo-project-path' cannot be found."
   (if-let ((is-sourcemap-enabled eglot-luau-rojo-sourcemap-enabled)
-           (is-luau-server (string= (slot-value server 'language-id) "luau"))
+           (is-luau-server (member '(lua-mode . "luau") (slot-value server 'languages)))
            (is-rojo-installed (executable-find "rojo")))
       (let* ((rojo-process (make-process
                             :name "luau-lsp-rojo-sourcemap"
