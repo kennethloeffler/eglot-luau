@@ -3,10 +3,10 @@
 ;; Copyright (C) 2024 Kenneth Loeffler
 
 ;; Author: Kenneth Loeffler <kenloef@gmail.com>
-;; Version: 0.1.2
+;; Version: 0.2.2
 ;; Keywords: roblox, luau, tools
 ;; URL: https://github.com/kennethloeffler/eglot-luau
-;; Package-Requires: ((emacs "29.1"))
+;; Package-Requires: ((emacs "29.1") (eglot "1.17"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -173,16 +173,15 @@ docs files, respectively, need to be updated.  Respects the
     (eglot-luau--ensure-storage-directory)
     (with-temp-buffer
       (url-insert-file-contents eglot-luau-roblox-version-url)
-      (let ((version-file (eglot-luau--roblox-version-storage-uri)))
-        (if (file-exists-p version-file)
-            (let ((stored-version (with-temp-buffer
-                                    (insert-file-contents version-file)
-                                    (buffer-string))))
-              (if (not (string= stored-version (buffer-string)))
-                  (list eglot-luau-auto-update-roblox-types
-                        eglot-luau-auto-update-roblox-docs)
-                (eglot-luau--which-files-need-update)))
-          (write-file version-file)
+      (let* ((version-file (eglot-luau--roblox-version-storage-uri))
+             (stored-version (if (file-exists-p version-file)
+                                 (with-temp-buffer (insert-file-contents version-file)
+                                                   (buffer-string))
+                               "")))
+        (write-file version-file)
+        (if (not (string= stored-version (buffer-string)))
+            (list eglot-luau-auto-update-roblox-types
+                  eglot-luau-auto-update-roblox-docs)
           (eglot-luau--which-files-need-update))))))
 
 (defun eglot-luau--build-server-command-list ()
@@ -207,9 +206,11 @@ docs files, respectively, need to be updated.  Respects the
           (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
     (if eglot-luau-sync-fflags
         (let ((fflags (cdar (with-temp-buffer
-                              (url-insert-file-contents
-                               eglot-luau-current-roblox-fflags-url)
-                              (json-read)))))
+                              (with-demoted-errors
+                                  "Error while fetching Roblox FFlags: %s"
+                                (url-insert-file-contents
+                                 eglot-luau-current-roblox-fflags-url)
+                                (json-read))))))
           (dolist (fflag fflags)
             (let* ((name (symbol-name (car fflag)))
                    (trimmed-name (if (string-prefix-p "FFlagLuau" name)
@@ -252,11 +253,11 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
 
 (defun eglot-luau--make-rojo-process (server &rest _)
   "Handle the Rojo process for SERVER.
-SERVER must have a language-id equal to \"luau\". Fails when Rojo
-is not installed, or when a file at
-`eglot-luau-rojo-project-path' cannot be found."
+SERVER must support luau in `lua-mode' buffers.  Fails when Rojo
+ is not installed, or when a file at
+ `eglot-luau-rojo-project-path' cannot be found."
   (if-let ((is-sourcemap-enabled eglot-luau-rojo-sourcemap-enabled)
-           (is-luau-server (string= (slot-value server 'language-id) "luau"))
+           (is-luau-server (member '(lua-mode . "luau") (slot-value server 'languages)))
            (is-rojo-installed (executable-find "rojo")))
       (let* ((rojo-process (make-process
                             :name "luau-lsp-rojo-sourcemap"
