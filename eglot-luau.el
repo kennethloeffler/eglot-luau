@@ -206,9 +206,11 @@ docs files, respectively, need to be updated.  Respects the
           (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
     (if eglot-luau-sync-fflags
         (let ((fflags (cdar (with-temp-buffer
-                              (url-insert-file-contents
-                               eglot-luau-current-roblox-fflags-url)
-                              (json-read)))))
+                              (with-demoted-errors
+                                  "Error while fetching Roblox FFlags: %s"
+                                (url-insert-file-contents
+                                 eglot-luau-current-roblox-fflags-url)
+                                (json-read))))))
           (dolist (fflag fflags)
             (let* ((name (symbol-name (car fflag)))
                    (trimmed-name (if (string-prefix-p "FFlagLuau" name)
