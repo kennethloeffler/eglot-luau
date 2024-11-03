@@ -127,8 +127,8 @@
 
 (defun eglot-luau--ensure-storage-directory ()
   "Create luau-lsp storage folder if it doesn't exist."
-  (if (not (file-directory-p eglot-luau-storage-directory))
-      (make-directory eglot-luau-storage-directory)))
+  (when (not (file-directory-p eglot-luau-storage-directory))
+    (make-directory eglot-luau-storage-directory)))
 
 (defun eglot-luau--roblox-types-url ()
   "Return a URL that responds with Roblox type information."
@@ -189,37 +189,37 @@ docs files, respectively, need to be updated.  Respects the
   (let ((command-list (list "lsp" eglot-luau-server-executable)))
     (let ((types-uri (eglot-luau--roblox-types-storage-uri))
           (docs-uri (eglot-luau--roblox-docs-storage-uri)))
-      (if (file-exists-p types-uri)
-          (push (format "--definitions=%s" types-uri) command-list))
-      (if (file-exists-p docs-uri)
-          (push (format "--docs=%s" docs-uri) command-list)))
-    (if eglot-luau-custom-type-files
-        (dolist (file eglot-luau-custom-type-files)
-          (push (format "--definitions=%s" file) command-list)))
-    (if eglot-luau-custom-doc-files
-        (dolist (file eglot-luau-custom-doc-files)
-          (push (format "--docs=%s" file) command-list)))
-    (if (not eglot-luau-fflags-enabled)
-        (push "--no-flags-enabled" command-list))
-    (if eglot-luau-fflag-overrides
-        (dolist (fflag eglot-luau-fflag-overrides)
-          (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
-    (if eglot-luau-sync-fflags
-        (let ((fflags (cdar (with-temp-buffer
-                              (with-demoted-errors
-                                  "Error while fetching Roblox FFlags: %s"
-                                (url-insert-file-contents
-                                 eglot-luau-current-roblox-fflags-url)
-                                (json-read))))))
-          (dolist (fflag fflags)
-            (let* ((name (symbol-name (car fflag)))
-                   (trimmed-name (if (string-prefix-p "FFlagLuau" name)
-                                     (string-trim-left name "FFlag")
-                                   name))
-                   (value (cdr fflag)))
-              (if (not (assoc trimmed-name eglot-luau-fflag-overrides))
-                  (push (format "--flag:%s=%s" trimmed-name value)
-                        command-list))))))
+      (when (file-exists-p types-uri)
+        (push (format "--definitions=%s" types-uri) command-list))
+      (when (file-exists-p docs-uri)
+        (push (format "--docs=%s" docs-uri) command-list)))
+    (when eglot-luau-custom-type-files
+      (dolist (file eglot-luau-custom-type-files)
+        (push (format "--definitions=%s" file) command-list)))
+    (when eglot-luau-custom-doc-files
+      (dolist (file eglot-luau-custom-doc-files)
+        (push (format "--docs=%s" file) command-list)))
+    (unless eglot-luau-fflags-enabled
+      (push "--no-flags-enabled" command-list))
+    (when eglot-luau-fflag-overrides
+      (dolist (fflag eglot-luau-fflag-overrides)
+        (push (format "--flag:%s=%s" (car fflag) (cadr fflag)) command-list)))
+    (when eglot-luau-sync-fflags
+      (let ((fflags (cdar (with-temp-buffer
+                            (with-demoted-errors
+                                "Error while fetching Roblox FFlags: %s"
+                              (url-insert-file-contents
+                               eglot-luau-current-roblox-fflags-url)
+                              (json-read))))))
+        (dolist (fflag fflags)
+          (let* ((name (symbol-name (car fflag)))
+                 (trimmed-name (if (string-prefix-p "FFlagLuau" name)
+                                   (string-trim-left name "FFlag")
+                                 name))
+                 (value (cdr fflag)))
+            (unless (assoc trimmed-name eglot-luau-fflag-overrides)
+              (push (format "--flag:%s=%s" trimmed-name value)
+                    command-list))))))
     (nreverse command-list)))
 
 (defun eglot-luau--build-rojo-command-list ()
@@ -229,27 +229,27 @@ docs files, respectively, need to be updated.  Respects the
                             "sourcemap" "rojo")))
     (push (expand-file-name eglot-luau-rojo-project-path)
           command-list)
-    (if eglot-luau-rojo-sourcemap-includes-non-scripts
-        (push "--include-non-scripts" command-list))
+    (when eglot-luau-rojo-sourcemap-includes-non-scripts
+      (push "--include-non-scripts" command-list))
     (nreverse command-list)))
 
 (defun eglot-luau--rojo-process-filter (_process output)
   "Process filter that displays any errors during Rojo sourcemap generation.
 If OUTPUT contains an error message, display the output in a pop-up buffer."
-  (if (string-match "error" output)
-      (with-output-to-temp-buffer (get-buffer-create
-                                   "*luau-lsp sourcemap error*")
-        (princ
-         (format
-          "eglot-luau attempted to generate a sourcemap using the following command:
+  (when (string-match "error" output)
+    (with-output-to-temp-buffer (get-buffer-create
+                                 "*luau-lsp sourcemap error*")
+      (princ
+       (format
+        "eglot-luau attempted to generate a sourcemap using the following command:
 
 %s
 
 ...but the command outputted an error:
 
 %s"
-          (mapconcat #'identity (eglot-luau--build-rojo-command-list) " ")
-          output)))))
+        (mapconcat #'identity (eglot-luau--build-rojo-command-list) " ")
+        output)))))
 
 (defun eglot-luau--make-rojo-process (server &rest _)
   "Handle the Rojo process for SERVER.
@@ -279,12 +279,13 @@ SERVER must support luau in `lua-mode' buffers.  Fails when Rojo
                         (kill-process rojo-process))
                     (advice-remove #'eglot-shutdown advice-name)))
          '((name . advice-name))))
-    (if (and is-sourcemap-enabled
-             is-luau-server
-             (not is-rojo-installed))
-        (with-output-to-temp-buffer (get-buffer-create
-                                     "*luau-lsp sourcemap error*")
-          (princ "eglot-luau-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
+    (when (and is-sourcemap-enabled
+               is-luau-server
+               (not is-rojo-installed))
+      (with-output-to-temp-buffer (get-buffer-create
+                                   "*luau-lsp sourcemap error*")
+        (princ "eglot-luau-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
+
 
 ;;;###autoload
 (defun eglot-luau-setup ()
