@@ -286,6 +286,17 @@ SERVER must support luau in `lua-mode' buffers.  Fails when Rojo
                                    "*luau-lsp sourcemap error*")
         (princ "eglot-luau-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
 
+(defun eglot-luau--update-resource (kind)
+  "Attempt to fetch the resource KIND and store the result on disk."
+  (let* ((name (symbol-name kind))
+         (fetch-url (intern (format "eglot-luau--roblox-%s-url" name)))
+         (storage-uri (intern (format "eglot-luau--roblox-%s-storage-uri" name)))
+         (error-message (concat (format "Error while updating Roblox global %s: " name)
+                                "%s")))
+    (with-temp-buffer
+      (with-demoted-errors error-message
+        (url-insert-file-contents (funcall (symbol-function fetch-url)))
+        (write-file (funcall (symbol-function storage-uri)))))))
 
 ;;;###autoload
 (defun eglot-luau-setup ()
@@ -300,22 +311,12 @@ start a Rojo process to generate a sourcemap."
                (with-demoted-errors
                    "Error while fetching Roblox version: %s"
                  (eglot-luau--is-outdated))))
-    (if types-need-update
-        (with-temp-buffer
-          (with-demoted-errors
-              "Error while updating Roblox global types: %s"
-            (url-insert-file-contents (eglot-luau--roblox-types-url))
-            (write-file (eglot-luau--roblox-types-storage-uri)))))
-    (if docs-need-update
-        (with-temp-buffer
-          (with-demoted-errors
-              "Error while updating Roblox docs: %s"
-            (url-insert-file-contents eglot-luau-roblox-docs-url)
-            (write-file (eglot-luau--roblox-docs-storage-uri))))))
-  (add-hook 'eglot-server-initialized-hook #'eglot-luau--make-rojo-process)
-  (add-to-list 'eglot-server-programs
-               `((lua-mode :language-id "luau")
-                 . ,(eglot-luau--build-server-command-list))))
+    (when types-need-update (eglot-luau--update-resource 'types))
+    (when docs-need-update (eglot-luau--update-resource 'docs))
+    (add-hook 'eglot-server-initialized-hook #'eglot-luau--make-rojo-process)
+    (add-to-list 'eglot-server-programs
+                 `((lua-mode :language-id "luau")
+                   . ,(eglot-luau--build-server-command-list)))))
 
 (provide 'eglot-luau)
 ;;; eglot-luau.el ends here
