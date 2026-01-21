@@ -251,40 +251,42 @@ If OUTPUT contains an error message, display the output in a pop-up buffer."
         (mapconcat #'identity (eglot-luau--build-rojo-command-list) " ")
         output)))))
 
-(defun eglot-luau--make-rojo-process (server &rest _)
-  "Handle the Rojo process for SERVER.
-SERVER must support luau in `lua-mode' buffers.  Fails when Rojo
- is not installed, or when a file at
- `eglot-luau-rojo-project-path' cannot be found."
-  (if-let ((is-sourcemap-enabled eglot-luau-rojo-sourcemap-enabled)
-           (is-luau-server (member '(lua-mode . "luau") (slot-value server 'languages)))
-           (is-rojo-installed (executable-find "rojo")))
-      (let* ((rojo-process (make-process
-                            :name "luau-lsp-rojo-sourcemap"
-                            :command (eglot-luau--build-rojo-command-list)
-                            :filter #'eglot-luau--rojo-process-filter
-                            :noquery t))
-             (advice-name (concat (process-name rojo-process)
-                                  "-shutdown-advice")))
-        ;; eglot does not provide any hooks for server shutdown, so to
-        ;; know when to kill the Rojo process, we have to advise
-        ;; `eglot-shutdown' temporarily. This is a bit ugly and goes
-        ;; against elisp code conventions, but it's the only way to
-        ;; do it right now!
-        (advice-add
-         #'eglot-shutdown
-         :after (lambda (server-shutting-down &rest _)
-                  (when (eq server server-shutting-down)
-                    (if (process-live-p rojo-process)
-                        (kill-process rojo-process))
-                    (advice-remove #'eglot-shutdown advice-name)))
-         '((name . advice-name))))
-    (when (and is-sourcemap-enabled
-               is-luau-server
-               (not is-rojo-installed))
-      (with-output-to-temp-buffer (get-buffer-create
-                                   "*luau-lsp sourcemap error*")
-        (princ "eglot-luau-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path")))))
+(defun eglot-luau--make-rojo-process (mode)
+  "Return a handler for Rojo for servers running in MODE buffers.
+
+Server must support Luau in MODE buffers.  Fails when Rojo is not
+installed, or when a file at `eglot-luau-rojo-project-path' cannot be
+found."
+  (lambda (server &rest _)
+    (if-let* ((is-sourcemap-enabled eglot-luau-rojo-sourcemap-enabled)
+              (is-luau-server (member `(,(identity mode) . "Luau") (slot-value server 'languages)))
+              (is-rojo-installed (executable-find "rojo")))
+        (let* ((rojo-process (make-process
+                              :name "luau-lsp-rojo-sourcemap"
+                              :command (eglot-luau--build-rojo-command-list)
+                              :filter #'eglot-luau--rojo-process-filter
+                              :noquery t))
+               (advice-name (concat (process-name rojo-process)
+                                    "-shutdown-advice")))
+          ;; eglot does not provide any hooks for server shutdown, so to
+          ;; know when to kill the Rojo process, we have to advise
+          ;; `eglot-shutdown' temporarily. This is a bit ugly and goes
+          ;; against elisp code conventions, but it's the only way to
+          ;; do it right now!
+          (advice-add
+           #'eglot-shutdown
+           :after (lambda (server-shutting-down &rest _)
+                    (when (eq server server-shutting-down)
+                      (if (process-live-p rojo-process)
+                          (kill-process rojo-process))
+                      (advice-remove #'eglot-shutdown advice-name)))
+           '((name . advice-name))))
+      (when (and is-sourcemap-enabled
+                 is-luau-server
+                 (not is-rojo-installed))
+        (with-output-to-temp-buffer (get-buffer-create
+                                     "*luau-lsp sourcemap error*")
+          (princ "eglot-luau-rojo-sourcemap-enabled is non-nil, but Rojo is not on the path"))))))
 
 (defun eglot-luau--update-resource (kind)
   "Attempt to fetch the resource KIND and store the result on disk."
@@ -299,8 +301,8 @@ SERVER must support luau in `lua-mode' buffers.  Fails when Rojo
         (write-file (funcall (symbol-function storage-uri)))))))
 
 ;;;###autoload
-(defun eglot-luau-setup ()
-  "Set up luau-lsp for use in `lua-mode' buffers.
+(defun eglot-luau-setup (mode)
+  "Set up luau-lsp for use in MODE buffers.
 If `eglot-luau-auto-update-roblox-types' and/or
 `eglot-luau-auto-update-roblox-docs' are non-nil, attempt to
 download latest Roblox type defintions and/or docs.
@@ -313,9 +315,9 @@ start a Rojo process to generate a sourcemap."
                  (eglot-luau--is-outdated))))
     (when types-need-update (eglot-luau--update-resource 'types))
     (when docs-need-update (eglot-luau--update-resource 'docs))
-    (add-hook 'eglot-server-initialized-hook #'eglot-luau--make-rojo-process)
+    (add-hook 'eglot-server-initialized-hook (eglot-luau--make-rojo-process mode))
     (add-to-list 'eglot-server-programs
-                 `((lua-mode :language-id "luau")
+                 `((,(identity mode) :language-id "luau")
                    . ,(eglot-luau--build-server-command-list)))))
 
 (provide 'eglot-luau)
