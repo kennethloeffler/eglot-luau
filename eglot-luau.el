@@ -317,7 +317,7 @@ start a Rojo process to generate a sourcemap."
     (when docs-need-update (eglot-luau--update-resource 'docs))
     (add-hook 'eglot-server-initialized-hook (eglot-luau--make-rojo-process mode))
     (add-to-list 'eglot-server-programs
-                 `((,(identity mode) :language-id "luau")
+                 `((,(identity mode) :language-id "Luau")
                    . ,(eglot-luau--build-server-command-list)))))
 
 (provide 'eglot-luau)
