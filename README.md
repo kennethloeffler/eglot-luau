@@ -56,23 +56,23 @@ eglot-luau provides the following customizable variables:
 
 eglot-luau is also configurable using LSP's "workspace configuration," as described in [the Eglot documentation](https://joaotavora.github.io/eglot/#Project_002dspecific-configuration-1).
 
-The entry point to the package is the function `eglot-luau-setup`. This function should be called after eglot is loaded.
+The entry point to the package is the function `eglot-luau-setup`. This function should be called after eglot is loaded, but before eglot is invoked, once per major mode you intend to use eglot-luau. A good time to do this is in major mode hooks. It takes one argument: the symbol of the mode for which to setup eglot-luau.
 
 Below is a example configuration using `use-package`:
 
 ```elisp
 (use-package eglot-luau
-  :demand t
-  :after (lua-mode eglot)
-  :functions eglot-luau-setup
-  :config (eglot-luau-setup)
+  :autoload (eglot-luau-setup)
+  :load-path "~/projects/programming/eglot-luau"
   :custom
   (eglot-luau-rojo-sourcemap-enabled t)
   (eglot-luau-rojo-sourcemap-includes-non-scripts t)
   (eglot-luau-auto-update-roblox-docs t)
   (eglot-luau-auto-update-roblox-types t)
-  (eglot-luau-fflag-overrides '(("LuauNonStrictByDefaultBetaFeature" "False")))
-  :hook (lua-mode . eglot-ensure))
+  (eglot-luau-fflag-overrides '(("LuauSolverV2" "True")))
+  :hook
+  (lua-mode . (lambda () (eglot-luau-setup 'lua-mode)))
+  (lua-mode . eglot-ensure))
 ```
 
 ## Known issues
