@@ -63,7 +63,6 @@ Below is a example configuration using `use-package`:
 ```elisp
 (use-package eglot-luau
   :autoload (eglot-luau-setup)
-  :load-path "~/projects/programming/eglot-luau"
   :custom
   (eglot-luau-rojo-sourcemap-enabled t)
   (eglot-luau-rojo-sourcemap-includes-non-scripts t)
